@@ -101,6 +101,10 @@
     [self setCurrentDirectoryPath:selectedPath];
 }
 
+- (void)test {
+    
+}
+
 
 #pragma mark TableView Controller
 
