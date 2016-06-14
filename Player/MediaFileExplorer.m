@@ -6,9 +6,9 @@
 //  Copyright © 2016년 kwk.self. All rights reserved.
 //
 
-#import "ViewController.h"
+#import "MediaFileExplorer.h"
 
-@interface ViewController ()
+@interface MediaFileExplorer ()
 
 @property (nonatomic) IBOutlet NSTableView *tableView;
 
@@ -19,7 +19,7 @@
 
 @end
 
-@implementation ViewController
+@implementation MediaFileExplorer
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -92,16 +92,6 @@
     return [attributes objectForKey:NSFileType];
 }
 
-- (void)changeCurrentDirectoryToParentDirectory {
-    [self setCurrentDirectoryPath:[_currentDirectoryPath stringByDeletingLastPathComponent]];
-}
-
-- (void)changeCurrentDirectoryToSubDirectory:(NSString*)pathComponent {
-    NSString *selectedPath = [_currentDirectoryPath stringByAppendingPathComponent:pathComponent];
-    [self setCurrentDirectoryPath:selectedPath];
-}
-
-
 
 #pragma mark TableView Controller
 
@@ -122,7 +112,7 @@
 
 - (void)doubleClickEvent:(id)sender {
     if([_tableView selectedRow] == 0) {
-        [self changeCurrentDirectoryToParentDirectory];
+        [self setCurrentDirectoryPath:[_currentDirectoryPath stringByDeletingLastPathComponent]];
         [_tableView reloadData];
     } else if ([_tableView selectedRow] != -1) {
         NSString *selectedPath = [_currentDirectoryPath stringByAppendingPathComponent:[_currentDirectoryFileArray objectAtIndex:[_tableView selectedRow]]];

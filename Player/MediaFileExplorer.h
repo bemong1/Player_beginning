@@ -9,7 +9,7 @@
 #import <Cocoa/Cocoa.h>
 
 
-@interface ViewController : NSViewController
+@interface MediaFileExplorer : NSViewController
 
 
 @end
