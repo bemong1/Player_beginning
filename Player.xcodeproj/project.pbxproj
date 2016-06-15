@@ -24,6 +24,7 @@
 		E0368D981D0E8D4D008C92CB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E0368D9B1D0E8D4D008C92CB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		E0368D9D1D0E8D4D008C92CB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E0D0E9101D0FBAC000F0D4CF /* feather-webfont.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "feather-webfont.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,6 +72,7 @@
 		E0368D921D0E8D4D008C92CB /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				E0D0E9101D0FBAC000F0D4CF /* feather-webfont.ttf */,
 				E0368D931D0E8D4D008C92CB /* main.m */,
 			);
 			name = "Supporting Files";

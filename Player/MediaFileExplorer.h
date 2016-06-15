@@ -11,6 +11,5 @@
 
 @interface MediaFileExplorer : NSViewController
 
-
 @end
 
