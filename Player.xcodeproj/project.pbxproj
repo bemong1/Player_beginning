@@ -12,6 +12,10 @@
 		E0368D971D0E8D4D008C92CB /* MediaFileExplorer.m in Sources */ = {isa = PBXBuildFile; fileRef = E0368D961D0E8D4D008C92CB /* MediaFileExplorer.m */; };
 		E0368D991D0E8D4D008C92CB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E0368D981D0E8D4D008C92CB /* Assets.xcassets */; };
 		E0368D9C1D0E8D4D008C92CB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E0368D9A1D0E8D4D008C92CB /* Main.storyboard */; };
+		E0D0E91D1D10F66300F0D4CF /* PlayerController.m in Sources */ = {isa = PBXBuildFile; fileRef = E0D0E9121D10F66300F0D4CF /* PlayerController.m */; };
+		E0D0E91E1D10F66300F0D4CF /* PlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E0D0E9141D10F66300F0D4CF /* PlayerViewController.m */; };
+		E0D0E9211D10F66300F0D4CF /* CALayer+AddMethod.m in Sources */ = {isa = PBXBuildFile; fileRef = E0D0E91A1D10F66300F0D4CF /* CALayer+AddMethod.m */; };
+		E0D0E9221D10F66300F0D4CF /* NSString+AddMethod.m in Sources */ = {isa = PBXBuildFile; fileRef = E0D0E91C1D10F66300F0D4CF /* NSString+AddMethod.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,6 +29,14 @@
 		E0368D9B1D0E8D4D008C92CB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		E0368D9D1D0E8D4D008C92CB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E0D0E9101D0FBAC000F0D4CF /* feather-webfont.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "feather-webfont.ttf"; sourceTree = "<group>"; };
+		E0D0E9111D10F66300F0D4CF /* PlayerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlayerController.h; sourceTree = "<group>"; };
+		E0D0E9121D10F66300F0D4CF /* PlayerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlayerController.m; sourceTree = "<group>"; };
+		E0D0E9131D10F66300F0D4CF /* PlayerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlayerViewController.h; sourceTree = "<group>"; };
+		E0D0E9141D10F66300F0D4CF /* PlayerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlayerViewController.m; sourceTree = "<group>"; };
+		E0D0E9191D10F66300F0D4CF /* CALayer+AddMethod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CALayer+AddMethod.h"; sourceTree = "<group>"; };
+		E0D0E91A1D10F66300F0D4CF /* CALayer+AddMethod.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CALayer+AddMethod.m"; sourceTree = "<group>"; };
+		E0D0E91B1D10F66300F0D4CF /* NSString+AddMethod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+AddMethod.h"; sourceTree = "<group>"; };
+		E0D0E91C1D10F66300F0D4CF /* NSString+AddMethod.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+AddMethod.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,6 +73,14 @@
 				E0368D901D0E8D4D008C92CB /* AppDelegate.m */,
 				E0368D951D0E8D4D008C92CB /* MediaFileExplorer.h */,
 				E0368D961D0E8D4D008C92CB /* MediaFileExplorer.m */,
+				E0D0E9111D10F66300F0D4CF /* PlayerController.h */,
+				E0D0E9121D10F66300F0D4CF /* PlayerController.m */,
+				E0D0E9131D10F66300F0D4CF /* PlayerViewController.h */,
+				E0D0E9141D10F66300F0D4CF /* PlayerViewController.m */,
+				E0D0E9191D10F66300F0D4CF /* CALayer+AddMethod.h */,
+				E0D0E91A1D10F66300F0D4CF /* CALayer+AddMethod.m */,
+				E0D0E91B1D10F66300F0D4CF /* NSString+AddMethod.h */,
+				E0D0E91C1D10F66300F0D4CF /* NSString+AddMethod.m */,
 				E0368D981D0E8D4D008C92CB /* Assets.xcassets */,
 				E0368D9A1D0E8D4D008C92CB /* Main.storyboard */,
 				E0368D9D1D0E8D4D008C92CB /* Info.plist */,
@@ -148,8 +168,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				E0368D971D0E8D4D008C92CB /* MediaFileExplorer.m in Sources */,
+				E0D0E9221D10F66300F0D4CF /* NSString+AddMethod.m in Sources */,
 				E0368D941D0E8D4D008C92CB /* main.m in Sources */,
+				E0D0E91D1D10F66300F0D4CF /* PlayerController.m in Sources */,
 				E0368D911D0E8D4D008C92CB /* AppDelegate.m in Sources */,
+				E0D0E9211D10F66300F0D4CF /* CALayer+AddMethod.m in Sources */,
+				E0D0E91E1D10F66300F0D4CF /* PlayerViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

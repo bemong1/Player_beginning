@@ -8,7 +8,11 @@
 
 #import "MediaFileExplorer.h"
 
+#import "PlayerViewController.h"
+
 @interface MediaFileExplorer ()
+
+@property (nonatomic) PlayerViewController *playerViewController;
 
 @property (nonatomic) IBOutlet NSTableView *tableView;
 
@@ -29,7 +33,7 @@
     
     [_tableView setDoubleAction:@selector(doubleClickEvent:)];
     
-    _mediaFileType = @[@"mov", @"m4v", @"mp4"];
+    _mediaFileType = @[@"mov", @"m4v", @"mp4", @"MP4"];
     [self setCurrentDirectoryURL:[NSHomeDirectory() stringByAppendingPathComponent:@"Documents"]];
 }
 
@@ -141,6 +145,12 @@
 
 #pragma mark Mouse event
 
+- (void)createPlayerViewController {
+    NSStoryboard *storyboard = [NSStoryboard storyboardWithName:@"Main" bundle:nil];
+    _playerViewController = [storyboard instantiateControllerWithIdentifier:@"playerViewController"];
+    [_playerViewController presentViewControllerAsModalWindow:_playerViewController];
+}
+
 - (void)doubleClickEvent:(id)sender {
     if ([_tableView selectedRow] != -1) {
         if([[_fileNamesInCurrentDirectory objectAtIndex:[_tableView selectedRow]] isEqualToString:@".."]) {
@@ -150,7 +160,15 @@
             [self moveToSubDirectory:[_fileNamesInCurrentDirectory objectAtIndex:[_tableView selectedRow]]];
             [_tableView reloadData];
         } else if([self fileType:[_fileNamesInCurrentDirectory objectAtIndex:[_tableView selectedRow]]] == NSFileTypeRegular){
-            NSLog(@"Play!!!!!");
+            [self createPlayerViewController];
+            
+            [_playerViewController stopMediaFile];
+            NSString* check = [NSString stringWithFormat:@"file://"];
+            check = [check stringByAppendingString:[self setURLOfFile:[_fileNamesInCurrentDirectory objectAtIndex:[_tableView selectedRow]]]];
+
+            NSURL* fileURL = [NSURL URLWithString:check];
+            [_playerViewController loadMediaFile:fileURL];
+            
         }
     } else {
         NSLog(@"Fail");
