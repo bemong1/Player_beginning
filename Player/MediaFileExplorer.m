@@ -85,7 +85,7 @@
             [mediaFileArray addObject:object];
         }
     }
-    
+    ;
     NSArray *directorySorted = [directoryArray sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
     NSArray *mediaFileSorted = [mediaFileArray sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
     
