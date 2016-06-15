@@ -33,7 +33,7 @@
     
     [_tableView setDoubleAction:@selector(doubleClickEvent:)];
     
-    _mediaFileType = @[@"mov", @"m4v", @"mp4", @"MP4"];
+    _mediaFileType = @[@"mov", @"m4v", @"mp4"];
     [self setCurrentDirectoryURL:[NSHomeDirectory() stringByAppendingPathComponent:@"Documents"]];
 }
 
@@ -69,7 +69,14 @@
 
 - (void)filterMediaFilesAndDirectories {
     [_fileNamesInCurrentDirectory enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(id object, NSUInteger index, BOOL *stop) {
-        if(([self fileType:object] != NSFileTypeDirectory) && (![_mediaFileType containsObject:[object pathExtension]])) {
+        BOOL mediaFileType = NO;
+        for (NSString* str in _mediaFileType) {
+            if ([str caseInsensitiveCompare:[object pathExtension]] == NSOrderedSame) {
+                mediaFileType = YES;
+                break;
+            }
+        }
+        if(([self fileType:object] != NSFileTypeDirectory) && mediaFileType == NO) {
             [_fileNamesInCurrentDirectory removeObject:object];
         }
         if([object isEqualToString:@"$RECYCLE.BIN"]) {
@@ -88,8 +95,7 @@
         } else {
             [mediaFileArray addObject:object];
         }
-    }
-    ;
+    }    
     NSArray *directorySorted = [directoryArray sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
     NSArray *mediaFileSorted = [mediaFileArray sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
     
@@ -145,10 +151,16 @@
 
 #pragma mark Mouse event
 
-- (void)createPlayerViewController {
+- (void)createPlayerViewController:(NSInteger)row {
     NSStoryboard *storyboard = [NSStoryboard storyboardWithName:@"Main" bundle:nil];
     _playerViewController = [storyboard instantiateControllerWithIdentifier:@"playerViewController"];
     [_playerViewController presentViewControllerAsModalWindow:_playerViewController];
+    
+    NSString* usableAsURL = [NSString stringWithFormat:@"file://"];
+    usableAsURL = [usableAsURL stringByAppendingString:[self setURLOfFile:[_fileNamesInCurrentDirectory objectAtIndex:row]]];
+    
+    NSURL* fileURL = [NSURL URLWithString:usableAsURL];
+    [_playerViewController loadMediaFile:fileURL];
 }
 
 - (void)doubleClickEvent:(id)sender {
@@ -160,15 +172,7 @@
             [self moveToSubDirectory:[_fileNamesInCurrentDirectory objectAtIndex:[_tableView selectedRow]]];
             [_tableView reloadData];
         } else if([self fileType:[_fileNamesInCurrentDirectory objectAtIndex:[_tableView selectedRow]]] == NSFileTypeRegular){
-            [self createPlayerViewController];
-            
-            [_playerViewController stopMediaFile];
-            NSString* check = [NSString stringWithFormat:@"file://"];
-            check = [check stringByAppendingString:[self setURLOfFile:[_fileNamesInCurrentDirectory objectAtIndex:[_tableView selectedRow]]]];
-
-            NSURL* fileURL = [NSURL URLWithString:check];
-            [_playerViewController loadMediaFile:fileURL];
-            
+            [self createPlayerViewController:[_tableView selectedRow]];
         }
     } else {
         NSLog(@"Fail");

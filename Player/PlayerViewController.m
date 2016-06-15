@@ -19,8 +19,6 @@
 @property (strong) IBOutlet NSView *bottomView;
 @property (strong) IBOutlet NSView *repeatIntervalView;
 
-//@property (strong) IBOutlet URLList *urlList;
-
 @property (strong) NSTimer *timer;
 
 #pragma mark Playback Controller Button
@@ -66,9 +64,6 @@
 - (IBAction)stepBackwardAction:(id)sender;
 - (IBAction)stepForwardAction:(id)sender;
 
-//- (IBAction)previousAction:(id)sender;
-//- (IBAction)nextAction:(id)sender;
-
 - (IBAction)toggleRepeatModeAction:(id)sender;
 - (IBAction)toggleMuteModeAction:(id)sender;
 - (IBAction)toggleShuffleModeAction:(id)sender;
@@ -87,8 +82,6 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-//    _urlList = [URLList sharedURLList];
 
     [self.view setWantsLayer:YES];
     [self.view.layer backgroundColorRed:0.0f green:0.0f blue:0.0f alpha:1.0f];
@@ -107,7 +100,7 @@
     [_seekBarSlider sendActionOn:NSLeftMouseUpMask|NSLeftMouseDraggedMask];
     [_volumeBarSlider sendActionOn:NSLeftMouseUpMask|NSLeftMouseDraggedMask];
     
-    _currentTimeViewButton.title = [NSString changeTimeFloatToNSString:_currentTime];
+    _currentTimeViewButton.title = [NSString changeTimeFloatToNSString:_playerController.currentTime];
     _durationTimeViewButton.title = [NSString changeTimeFloatToNSString:[self durationTime]];
     
     _seekBarSlider.floatValue = 0.0f;
@@ -117,6 +110,15 @@
     
     _minRate = 0.5f;
     _maxRate = 2.0f;
+}
+
+- (void)dealloc {
+    NSLog(@"dealloc");
+}
+
+- (void)dismissController:(id)sender {
+    [super dismissController:sender];
+    [self stopMediaFile];
 }
 
 - (void)setNotifications:(id)playerController {
@@ -134,7 +136,11 @@
         [self setAttributeButton:_playOrPauseButton title:@"" color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:25]];
         
         if(_timer == nil) {
-            _timer = [NSTimer scheduledTimerWithTimeInterval:(0.1) target:self selector:@selector(showPlaybackTime:) userInfo:nil repeats:YES];
+            
+            _timer = [NSTimer scheduledTimerWithTimeInterval:(0.1) target:self selector:@selector(showPlaybackTime:) userInfo:nil  repeats:YES];
+            [[NSRunLoop mainRunLoop] addTimer:_timer forMode:NSRunLoopCommonModes];
+
+            
         }
     } else if(_playerController.playbackState == PlaybackStatePaused) {
         [self setAttributeButton:_playOrPauseButton title:@"" color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:25]];
@@ -165,11 +171,11 @@
         _seekBarSlider.maxValue = _playerController.durationTime;
         _volumeBarSlider.maxValue = 1.0f;
         
-        _currentTimeViewButton.title = [NSString changeTimeFloatToNSString:_currentTime];
+        _currentTimeViewButton.title = [NSString changeTimeFloatToNSString:_playerController.currentTime];
         _durationTimeViewButton.title = [NSString changeTimeFloatToNSString:[self durationTime]];
     } else if(_playerController.loadState == LoadStateFailed) {
         [self setEnabledSubControllers:NO];
-//        [self next];
+
     }
 }
 
@@ -178,20 +184,14 @@
         [_playerController setCurrentTime:0.0f];
         [_playerController play];
     } else {
-//        [self next];
+
     }
 }
 
 - (void)showPlaybackTime:(NSTimer*)timer {
     _seekBarSlider.floatValue = _playerController.currentTime;
-    
-    if(_remainingTimeDisplay == NO) {
-        _currentTimeViewButton.title = [NSString changeTimeFloatToNSString:_currentTime];
-        _durationTimeViewButton.title = [NSString changeTimeFloatToNSString:[self durationTime]];
-    } else {
-        _currentTimeViewButton.title = [NSString changeTimeFloatToNSString:[self remainingTime]];
-        _durationTimeViewButton.title = [NSString changeTimeFloatToNSString:[self durationTime]];
-    }
+    _currentTimeViewButton.title = [NSString changeTimeFloatToNSString:_playerController.currentTime];
+    _durationTimeViewButton.title = [NSString changeTimeFloatToNSString:[self durationTime]];
 }
 
 
@@ -215,11 +215,6 @@
     if(_playerController.playbackState == PlaybackStatePlaying) {
         [_playerController setRate:_currentRate];
     }
-}
-
-- (void)setCurrentTime:(float)currentTime {
-    [_playerController setCurrentTime:currentTime];
-    _currentTime = currentTime;
 }
 
 - (float)remainingTime {
@@ -356,8 +351,8 @@
 }
 
 - (IBAction)seekBarAction:(id)sender {
-    [self setCurrentTime:_seekBarSlider.floatValue];    
-    _currentTimeViewButton.title = [NSString changeTimeFloatToNSString:_currentTime];
+    _playerController.currentTime = _seekBarSlider.floatValue;
+    _currentTimeViewButton.title = [NSString changeTimeFloatToNSString:_playerController.currentTime];
 }
 
 - (IBAction)volumeBarAction:(id)sender {
@@ -369,14 +364,6 @@
         [self setAttributeButton:_toggleMuteModeButton title:@"" color:[NSColor blueColor] font:[NSFont fontWithName:@"Pe-icon-7-stroke" size:30]];
     }
 }
-
-//- (IBAction)previousAction:(id)sender {
-//    [self previous];
-//}
-//
-//- (IBAction)nextAction:(id)sender {
-//    [self next];
-//}
 
 - (IBAction)changeVideoGravityAction:(id)sender {
     [self changeVideoGravity];
@@ -412,7 +399,7 @@
 }
 
 - (IBAction)currentTimeViewAction:(id)sender {
-    [self setRemainingTimeDisplay:!_remainingTimeDisplay];
+    
 }
 
 - (IBAction)repeatIntervalAction:(id)sender {
