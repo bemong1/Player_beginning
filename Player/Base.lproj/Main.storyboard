@@ -1090,6 +1090,9 @@
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system" size="25"/>
                                         </buttonCell>
+                                        <connections>
+                                            <action selector="repeatIntervalStartAction:" target="H6C-rF-ino" id="VXx-JJ-XMN"/>
+                                        </connections>
                                     </button>
                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Xhd-jf-Lch">
                                         <rect key="frame" x="125" y="0.0" width="125" height="50"/>
@@ -1097,6 +1100,9 @@
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system" size="25"/>
                                         </buttonCell>
+                                        <connections>
+                                            <action selector="repeatIntervalEndAction:" target="H6C-rF-ino" id="BeP-a8-2BO"/>
+                                        </connections>
                                     </button>
                                 </subviews>
                                 <constraints>
@@ -1138,6 +1144,8 @@
                         <outlet property="playOrPauseButton" destination="c9d-du-sWz" id="psj-rL-eO0"/>
                         <outlet property="previousButton" destination="zzl-dT-A6c" id="jjJ-5E-WCf"/>
                         <outlet property="repeatIntervalButton" destination="qz6-uU-ZiD" id="ZF4-vH-Iq2"/>
+                        <outlet property="repeatIntervalEndButton" destination="Xhd-jf-Lch" id="MRa-vL-34E"/>
+                        <outlet property="repeatIntervalStartButton" destination="kYE-mD-LDT" id="9ye-QO-onq"/>
                         <outlet property="repeatIntervalView" destination="bwZ-ME-mFu" id="atY-TX-gDN"/>
                         <outlet property="restorePlaybackRateButton" destination="iA8-Pl-2gR" id="9Rp-l6-DMy"/>
                         <outlet property="seekBarSlider" destination="2ou-Ql-Y2p" id="vUO-zM-ZGz"/>

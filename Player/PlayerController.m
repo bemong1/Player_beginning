@@ -150,7 +150,7 @@ NSString *const PlayerControllerPlaybackDidPlayToEndTimeNotification = @"PlayerC
 }
 
 - (void)setCurrentTime:(float)currentTime {
-    [_player seekToTime:CMTimeMakeWithSeconds(currentTime, 1000)];
+    [_player seekToTime:CMTimeMakeWithSeconds(currentTime, _player.currentItem.asset.duration.timescale) toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
 }
 
 - (float)currentTime {

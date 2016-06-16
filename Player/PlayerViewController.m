@@ -19,7 +19,8 @@
 @property (strong) IBOutlet NSView *bottomView;
 @property (strong) IBOutlet NSView *repeatIntervalView;
 
-@property (strong) NSTimer *timer;
+@property (strong) NSTimer *showPlaybackTimer;
+@property (strong) NSTimer *repeatIntervalTimer;
 
 #pragma mark Playback Controller Button
 
@@ -49,8 +50,8 @@
 @property (strong) IBOutlet NSButton *durationTimeViewButton;
 
 @property (strong) IBOutlet NSButton *repeatIntervalButton;
-@property (strong) IBOutlet NSButton *setRepeatIntervalStartButton;
-@property (strong) IBOutlet NSButton *setRepeatIntervalEndButton;
+@property (strong) IBOutlet NSButton *repeatIntervalStartButton;
+@property (strong) IBOutlet NSButton *repeatIntervalEndButton;
 
 @property (strong) IBOutlet NSProgressIndicator *loadStateProgressIndicator;
 
@@ -73,6 +74,8 @@
 - (IBAction)volumeBarAction:(id)sender;
 
 - (IBAction)repeatIntervalAction:(id)sender;
+- (IBAction)repeatIntervalStartAction:(id)sender;
+- (IBAction)repeatIntervalEndAction:(id)sender;
 
 @end
 
@@ -91,11 +94,9 @@
     [_bottomView.layer backgroundColorRed:0.5f green:0.0f blue:0.0f alpha:0.5f];
     
     [_repeatIntervalView setWantsLayer:YES];
-    [_repeatIntervalView.layer backgroundColorRed:0.5f green:0.0f blue:0.0f alpha:0.5f];
     [_repeatIntervalView setHidden:YES];
     
     [self setButtonTitle];
-    
     _loadStateProgressIndicator.hidden = YES;
     
     [_seekBarSlider sendActionOn:NSLeftMouseDownMask|NSLeftMouseDraggedMask];
@@ -136,16 +137,16 @@
     if(_playerController.playbackState == PlaybackStatePlaying) {
         [self setAttributeButton:_playOrPauseButton title:@"" color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:25]];
         
-        if(_timer == nil) {
-            _timer = [NSTimer scheduledTimerWithTimeInterval:(0.1) target:self selector:@selector(onShowPlaybackTime:) userInfo:nil  repeats:YES];
-            [[NSRunLoop mainRunLoop] addTimer:_timer forMode:NSRunLoopCommonModes];
+        if(_showPlaybackTimer == nil) {
+            _showPlaybackTimer = [NSTimer scheduledTimerWithTimeInterval:(0.1) target:self selector:@selector(onShowPlaybackTime:) userInfo:nil  repeats:YES];
+            [[NSRunLoop mainRunLoop] addTimer:_showPlaybackTimer forMode:NSRunLoopCommonModes];
         }
     } else if(_playerController.playbackState == PlaybackStatePaused) {
         [self setAttributeButton:_playOrPauseButton title:@"" color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:25]];
         
-        if([_timer isValid]) {
-            [_timer invalidate];
-            _timer = nil;
+        if([_showPlaybackTimer isValid]) {
+            [_showPlaybackTimer invalidate];
+            _showPlaybackTimer = nil;
         }
     }
 }
@@ -158,6 +159,12 @@
         [_loadStateProgressIndicator startAnimation:nil];
     } else if(_playerController.loadState == LoadStateLoaded) {
         [self setEnabledSubControllers:YES];
+        
+        [self setAttributeButton:_repeatIntervalStartButton title:[NSString changeTimeFloatToNSString:0.0f] color:[NSColor blackColor] font:[NSFont fontWithName:@"Feather" size:25]];
+        [_repeatIntervalStartButton.layer backgroundColorRed:0.5f green:0.0f blue:0.0f alpha:0.5f];
+        [self setAttributeButton:_repeatIntervalEndButton title:[NSString changeTimeFloatToNSString:_playerController.durationTime] color:[NSColor blackColor] font:[NSFont fontWithName:@"Feather" size:25]];
+        [_repeatIntervalEndButton.layer backgroundColorRed:0.5f green:0.0f blue:0.0f alpha:0.5f];
+        _endTime = _playerController.durationTime;
         
         [_loadStateProgressIndicator stopAnimation:nil];
         _loadStateProgressIndicator.hidden = YES;
@@ -190,6 +197,13 @@
     _seekBarSlider.floatValue = _playerController.currentTime;
     _currentTimeViewButton.title = [NSString changeTimeFloatToNSString:_playerController.currentTime];
     _durationTimeViewButton.title = [NSString changeTimeFloatToNSString:_playerController.durationTime];
+    
+//    if(_toggleStartTime == YES || _toggleEndTime == YES) {
+//        [self onRepeatIntervalTime:nil];
+//        [self setAttributeButton:_repeatIntervalButton title:[NSString stringWithFormat:@"A⇄B"] color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:21]];
+//    } else {
+//        [self setAttributeButton:_repeatIntervalButton title:[NSString stringWithFormat:@"A⇄B"] color:[NSColor redColor] font:[NSFont fontWithName:@"Feather" size:21]];
+//    }
 }
 
 
@@ -368,8 +382,81 @@
 }
 
 - (IBAction)repeatIntervalAction:(id)sender {
-    
+    if(_repeatIntervalView.isHidden == YES){
+        [_repeatIntervalView setHidden:NO];
+    } else {
+        [_repeatIntervalView setHidden:YES];
+    }
 }
+
+- (IBAction)repeatIntervalStartAction:(id)sender {
+    if(_toggleStartTime == YES) {
+        [_repeatIntervalStartButton.layer backgroundColorRed:0.5f green:0.0f blue:0.0f alpha:0.5f];
+        [self setStartTime:0.0f];
+    } else {
+        [_repeatIntervalStartButton.layer backgroundColorRed:0.0f green:0.0f blue:0.5f alpha:0.5f];
+        [self setStartTime:_playerController.currentTime];
+    }
+    [self setAttributeButton:_repeatIntervalStartButton title:[NSString changeTimeFloatToNSString:_startTime] color:[NSColor blackColor] font:[NSFont fontWithName:@"Feather" size:25]];
+    [self setToggleStartTime:!_toggleStartTime];
+}
+
+- (IBAction)repeatIntervalEndAction:(id)sender {
+    if(_toggleEndTime == YES) {
+        [_repeatIntervalEndButton.layer backgroundColorRed:0.5f green:0.0f blue:0.0f alpha:0.5f];
+        [self setEndTime:_playerController.durationTime];
+
+    } else {
+        [_repeatIntervalEndButton.layer backgroundColorRed:0.0f green:0.0f blue:0.5f alpha:0.5f];
+        [self setEndTime:_playerController.currentTime];
+    }
+    [self setAttributeButton:_repeatIntervalEndButton title:[NSString changeTimeFloatToNSString:_endTime] color:[NSColor blackColor] font:[NSFont fontWithName:@"Feather" size:25]];
+    [self setToggleEndTime:!_toggleEndTime];
+}
+
+- (void)onRepeatIntervalTime:(NSTimer*)timer {
+    if(_startTime - 0.01f > _seekBarSlider.floatValue) {
+        _playerController.currentTime = _startTime;
+    }
+    if(_endTime < _seekBarSlider.floatValue) {
+        _playerController.currentTime = _startTime;
+    }
+    NSLog(@"start:%f, current:%f", _startTime, _seekBarSlider.floatValue);
+}
+
+- (void)setToggleStartTime:(BOOL)toggleStartTime {
+    _toggleStartTime = toggleStartTime;
+    if(_toggleStartTime == YES || _toggleEndTime == YES) {
+        if(_repeatIntervalTimer == nil) {
+            _repeatIntervalTimer = [NSTimer scheduledTimerWithTimeInterval:(0.1) target:self selector:@selector(onRepeatIntervalTime:) userInfo:nil  repeats:YES];
+            [[NSRunLoop mainRunLoop] addTimer:_repeatIntervalTimer forMode:NSRunLoopCommonModes];
+        }
+        [self setAttributeButton:_repeatIntervalButton title:[NSString stringWithFormat:@"A⇄B"] color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:21]];
+    } else {
+        if([_repeatIntervalTimer isValid]) {
+            [_repeatIntervalTimer invalidate];
+            _repeatIntervalTimer = nil;
+        }
+        [self setAttributeButton:_repeatIntervalButton title:[NSString stringWithFormat:@"A⇄B"] color:[NSColor redColor] font:[NSFont fontWithName:@"Feather" size:21]];
+    }
+}
+- (void)setToggleEndTime:(BOOL)toggleEndTime {
+    _toggleEndTime = toggleEndTime;
+    if(_toggleStartTime == YES || _toggleEndTime == YES) {
+        if(_repeatIntervalTimer == nil) {
+            _repeatIntervalTimer = [NSTimer scheduledTimerWithTimeInterval:(0.1) target:self selector:@selector(onRepeatIntervalTime:) userInfo:nil  repeats:YES];
+            [[NSRunLoop mainRunLoop] addTimer:_repeatIntervalTimer forMode:NSRunLoopCommonModes];
+        }
+        [self setAttributeButton:_repeatIntervalButton title:[NSString stringWithFormat:@"A⇄B"] color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:21]];
+    } else {
+        if([_repeatIntervalTimer isValid]) {
+            [_repeatIntervalTimer invalidate];
+            _repeatIntervalTimer = nil;
+        }
+        [self setAttributeButton:_repeatIntervalButton title:[NSString stringWithFormat:@"A⇄B"] color:[NSColor redColor] font:[NSFont fontWithName:@"Feather" size:21]];
+    }
+}
+
 
 #pragma mark Mouse event
 
@@ -380,6 +467,7 @@
     if(flag == NO) {
         [_topView animator].hidden = YES;
         [_bottomView animator].hidden = YES;
+        _repeatIntervalView.hidden = YES;
     } else {
         [_topView animator].hidden = NO;
         [_bottomView animator].hidden = NO;

@@ -24,6 +24,11 @@
 @property (nonatomic) BOOL shuffle;
 @property (nonatomic) BOOL mute;
 
+@property (nonatomic) float startTime;
+@property (nonatomic) float endTime;
+@property (nonatomic) BOOL toggleStartTime;
+@property (nonatomic) BOOL toggleEndTime;
+
 - (void)loadMediaFile:(NSURL*)url;
 - (void)stopMediaFile;
 

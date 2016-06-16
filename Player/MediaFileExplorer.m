@@ -34,7 +34,7 @@
     [_tableView setDoubleAction:@selector(doubleClickEvent:)];
     
     _mediaFileType = @[@"mov", @"m4v", @"mp4"];
-    [self setCurrentDirectoryURL:[NSHomeDirectory() stringByAppendingPathComponent:@"Documents"]];    
+    [self setCurrentDirectoryURL:[NSHomeDirectory() stringByAppendingPathComponent:@"Downloads"]];    
 }
 
 
@@ -154,7 +154,6 @@
             return [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode(kGenericFolderIcon)];
         } else {
             return [NSImage imageNamed:@"play.png"];
-//            return [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode(kGenericCDROMIcon)];
         }
     } else {
         return [_fileNamesInCurrentDirectory objectAtIndex:row];
