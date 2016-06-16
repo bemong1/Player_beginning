@@ -18,15 +18,11 @@
 @property (nonatomic) float maxRate;
 @property (nonatomic) float currentRate;
 
-@property (nonatomic, readonly) float durationTime;
-
 @property (nonatomic) float currentVolume;
 
 @property (nonatomic) BOOL repeat;
 @property (nonatomic) BOOL shuffle;
 @property (nonatomic) BOOL mute;
-
-
 
 - (void)loadMediaFile:(NSURL*)url;
 - (void)stopMediaFile;

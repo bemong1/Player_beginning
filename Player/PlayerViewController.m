@@ -72,8 +72,6 @@
 - (IBAction)seekBarAction:(id)sender;
 - (IBAction)volumeBarAction:(id)sender;
 
-- (IBAction)currentTimeViewAction:(id)sender;
-
 - (IBAction)repeatIntervalAction:(id)sender;
 
 @end
@@ -84,7 +82,7 @@
     [super viewDidLoad];
 
     [self.view setWantsLayer:YES];
-    [self.view.layer backgroundColorRed:0.0f green:0.0f blue:0.0f alpha:1.0f];
+    [self.view.layer backgroundColorRed:0.0f green:0.0f blue:0.0f alpha:0.8f];
     
     [_topView setWantsLayer:YES];
     [_topView.layer backgroundColorRed:0.5f green:0.0f blue:0.0f alpha:0.5f];
@@ -92,16 +90,19 @@
     [_bottomView setWantsLayer:YES];
     [_bottomView.layer backgroundColorRed:0.5f green:0.0f blue:0.0f alpha:0.5f];
     
+    [_repeatIntervalView setWantsLayer:YES];
+    [_repeatIntervalView.layer backgroundColorRed:0.5f green:0.0f blue:0.0f alpha:0.5f];
+    [_repeatIntervalView setHidden:YES];
+    
     [self setButtonTitle];
-//    [self setEnabledSubControllers:YES];
     
     _loadStateProgressIndicator.hidden = YES;
     
-    [_seekBarSlider sendActionOn:NSLeftMouseUpMask|NSLeftMouseDraggedMask];
-    [_volumeBarSlider sendActionOn:NSLeftMouseUpMask|NSLeftMouseDraggedMask];
+    [_seekBarSlider sendActionOn:NSLeftMouseDownMask|NSLeftMouseDraggedMask];
+    [_volumeBarSlider sendActionOn:NSLeftMouseDownMask|NSLeftMouseDraggedMask];
     
     _currentTimeViewButton.title = [NSString changeTimeFloatToNSString:_playerController.currentTime];
-    _durationTimeViewButton.title = [NSString changeTimeFloatToNSString:[self durationTime]];
+    _durationTimeViewButton.title = [NSString changeTimeFloatToNSString:_playerController.durationTime];
     
     _seekBarSlider.floatValue = 0.0f;
     _volumeBarSlider.floatValue = 1.0f;
@@ -136,11 +137,8 @@
         [self setAttributeButton:_playOrPauseButton title:@"" color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:25]];
         
         if(_timer == nil) {
-            
-            _timer = [NSTimer scheduledTimerWithTimeInterval:(0.1) target:self selector:@selector(showPlaybackTime:) userInfo:nil  repeats:YES];
+            _timer = [NSTimer scheduledTimerWithTimeInterval:(0.1) target:self selector:@selector(onShowPlaybackTime:) userInfo:nil  repeats:YES];
             [[NSRunLoop mainRunLoop] addTimer:_timer forMode:NSRunLoopCommonModes];
-
-            
         }
     } else if(_playerController.playbackState == PlaybackStatePaused) {
         [self setAttributeButton:_playOrPauseButton title:@"" color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:25]];
@@ -172,7 +170,7 @@
         _volumeBarSlider.maxValue = 1.0f;
         
         _currentTimeViewButton.title = [NSString changeTimeFloatToNSString:_playerController.currentTime];
-        _durationTimeViewButton.title = [NSString changeTimeFloatToNSString:[self durationTime]];
+        _durationTimeViewButton.title = [NSString changeTimeFloatToNSString:_playerController.durationTime];
     } else if(_playerController.loadState == LoadStateFailed) {
         [self setEnabledSubControllers:NO];
 
@@ -188,10 +186,10 @@
     }
 }
 
-- (void)showPlaybackTime:(NSTimer*)timer {
+- (void)onShowPlaybackTime:(NSTimer*)timer {
     _seekBarSlider.floatValue = _playerController.currentTime;
     _currentTimeViewButton.title = [NSString changeTimeFloatToNSString:_playerController.currentTime];
-    _durationTimeViewButton.title = [NSString changeTimeFloatToNSString:[self durationTime]];
+    _durationTimeViewButton.title = [NSString changeTimeFloatToNSString:_playerController.durationTime];
 }
 
 
@@ -217,14 +215,6 @@
     }
 }
 
-- (float)remainingTime {
-    return _playerController.durationTime - _playerController.currentTime;
-}
-
-- (float)durationTime {
-    return _playerController.durationTime;
-}
-
 - (void)setCurrentVolume:(float)currentVolume {
     [_playerController setVolume:_currentVolume];
     _currentVolume = currentVolume;
@@ -238,7 +228,6 @@
     }
     _mute = mute;
 }
-
 
 - (void)loadMediaFile:(NSURL*)url {    
     _playerController = [[PlayerController alloc]initWithMediaFileURL:url andRect:self.view.bounds];
@@ -294,26 +283,6 @@
 - (void)stepForward {
     [_playerController setCurrentTime:_playerController.currentTime + 5.0f];
 }
-
-//- (void)previous {
-//    if(_shuffle == NO) {
-//        [_urlList movingCursorToPreviousLocation];
-//    } else {
-//        [_urlList movingCursorToRandomLocation];
-//    }
-//    [self stopMediaFile];
-//    [self loadMediaFile:[_urlList getURLFromCurrentCursor]];
-//}
-//
-//- (void)next {
-//    if(_shuffle == NO) {
-//        [_urlList movingCursorToNextLocation];
-//    } else {
-//        [_urlList movingCursorToRandomLocation];
-//    }
-//    [self stopMediaFile];
-//    [self loadMediaFile:[_urlList getURLFromCurrentCursor]];
-//}
 
 
 #pragma mark Playback Controller Button
@@ -396,10 +365,6 @@
         _volumeBarSlider.floatValue = _currentVolume;
     }
     [self setMute:!_mute];
-}
-
-- (IBAction)currentTimeViewAction:(id)sender {
-    
 }
 
 - (IBAction)repeatIntervalAction:(id)sender {

@@ -673,13 +673,13 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="360"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1OG-jm-d4r">
+                            <scrollView autohidesScrollers="YES" horizontalLineScroll="25" horizontalPageScroll="10" verticalLineScroll="25" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1OG-jm-d4r">
                                 <rect key="frame" x="0.0" y="0.0" width="600" height="360"/>
                                 <clipView key="contentView" autoresizesSubviews="NO" id="oYM-Xh-wRJ">
                                     <rect key="frame" x="1" y="0.0" width="598" height="359"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="CiU-GQ-XIT" id="VPm-xO-voB">
+                                        <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowHeight="23" headerView="CiU-GQ-XIT" id="VPm-xO-voB">
                                             <rect key="frame" x="0.0" y="0.0" width="598" height="336"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <size key="intercellSpacing" width="3" height="2"/>
@@ -688,15 +688,11 @@
                                             <tableColumns>
                                                 <tableColumn identifier="type" editable="NO" width="40" minWidth="40" maxWidth="1000" id="2l0-Qx-1Wp" userLabel="icon">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Icon">
-                                                        <font key="font" metaFont="systemMedium" size="11"/>
+                                                        <font key="font" metaFont="smallSystem"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                     </tableHeaderCell>
-                                                    <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" alignment="center" title="Text Cell" id="CJA-Dk-oo5">
-                                                        <font key="font" metaFont="system"/>
-                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                        <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                    </textFieldCell>
+                                                    <imageCell key="dataCell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="Q6h-Qv-P2C"/>
                                                     <sortDescriptor key="sortDescriptorPrototype" selector="compare:" sortKey="key"/>
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                 </tableColumn>
@@ -1022,9 +1018,6 @@
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
-                                        <connections>
-                                            <action selector="currentTimeViewAction:" target="H6C-rF-ino" id="9tr-lr-Gnd"/>
-                                        </connections>
                                     </button>
                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dcE-QH-hT8">
                                         <rect key="frame" x="532" y="60" width="68" height="23"/>
@@ -1095,21 +1088,15 @@
                                         <rect key="frame" x="0.0" y="0.0" width="125" height="50"/>
                                         <buttonCell key="cell" type="smallSquare" title="00:00:00" bezelStyle="smallSquare" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" id="jTw-hW-ZGA">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="system"/>
+                                            <font key="font" metaFont="system" size="25"/>
                                         </buttonCell>
-                                        <connections>
-                                            <action selector="durationTimeViewAction:" target="H6C-rF-ino" id="aVb-KH-r06"/>
-                                        </connections>
                                     </button>
                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Xhd-jf-Lch">
                                         <rect key="frame" x="125" y="0.0" width="125" height="50"/>
                                         <buttonCell key="cell" type="smallSquare" title="00:00:00" bezelStyle="smallSquare" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" id="0nB-hF-thh">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="system"/>
+                                            <font key="font" metaFont="system" size="25"/>
                                         </buttonCell>
-                                        <connections>
-                                            <action selector="durationTimeViewAction:" target="H6C-rF-ino" id="Q7b-se-dMB"/>
-                                        </connections>
                                     </button>
                                 </subviews>
                                 <constraints>
@@ -1151,6 +1138,7 @@
                         <outlet property="playOrPauseButton" destination="c9d-du-sWz" id="psj-rL-eO0"/>
                         <outlet property="previousButton" destination="zzl-dT-A6c" id="jjJ-5E-WCf"/>
                         <outlet property="repeatIntervalButton" destination="qz6-uU-ZiD" id="ZF4-vH-Iq2"/>
+                        <outlet property="repeatIntervalView" destination="bwZ-ME-mFu" id="atY-TX-gDN"/>
                         <outlet property="restorePlaybackRateButton" destination="iA8-Pl-2gR" id="9Rp-l6-DMy"/>
                         <outlet property="seekBarSlider" destination="2ou-Ql-Y2p" id="vUO-zM-ZGz"/>
                         <outlet property="setRepeatIntervalEndButton" destination="Xhd-jf-Lch" id="ya3-Ap-H0J"/>

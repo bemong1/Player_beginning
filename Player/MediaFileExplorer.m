@@ -34,7 +34,7 @@
     [_tableView setDoubleAction:@selector(doubleClickEvent:)];
     
     _mediaFileType = @[@"mov", @"m4v", @"mp4"];
-    [self setCurrentDirectoryURL:[NSHomeDirectory() stringByAppendingPathComponent:@"Documents"]];
+    [self setCurrentDirectoryURL:[NSHomeDirectory() stringByAppendingPathComponent:@"Documents"]];    
 }
 
 
@@ -53,6 +53,13 @@
     _fileNamesInCurrentDirectory = fileNamesInCurrentDirectory;
     if(_fileNamesInCurrentDirectory == nil)
         _fileNamesInCurrentDirectory = [[NSMutableArray alloc]init];
+}
+
+- (void)addParentDirectoryInCurrentDictory {
+    if([_currentDirectoryURL isEqualToString:@"/"])
+        return;
+    
+    [_fileNamesInCurrentDirectory insertObject:@".." atIndex:0];
 }
 
 
@@ -112,19 +119,24 @@
 
 #pragma mark File and Directory Setting
 
-- (void)addParentDirectoryInCurrentDictory {
-    if([_currentDirectoryURL isEqualToString:@"/"])
-        return;
-    
-    [_fileNamesInCurrentDirectory insertObject:@".." atIndex:0];
-}
-
 - (void)moveToParentDirectory {
     [self setCurrentDirectoryURL:[_currentDirectoryURL stringByDeletingLastPathComponent]];
 }
 
 - (void)moveToSubDirectory:(NSString*)directoryName {
     [self setCurrentDirectoryURL:[self setURLOfFile:directoryName]];
+}
+
+- (void)createPlayerViewController:(NSString*)fileName {
+    NSStoryboard *storyboard = [NSStoryboard storyboardWithName:@"Main" bundle:nil];
+    _playerViewController = [storyboard instantiateControllerWithIdentifier:@"playerViewController"];
+    [_playerViewController presentViewControllerAsModalWindow:_playerViewController];
+    
+    NSString* aFilePathUsingURL = [NSString stringWithFormat:@"file://"];
+    aFilePathUsingURL = [aFilePathUsingURL stringByAppendingString:[self setURLOfFile:fileName]];
+    
+    NSURL* fileURL = [NSURL URLWithString:aFilePathUsingURL];
+    [_playerViewController loadMediaFile:fileURL];
 }
 
 
@@ -137,11 +149,12 @@
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
     if([tableColumn.identifier isEqualToString:@"type"]) {
         if([[_fileNamesInCurrentDirectory objectAtIndex:row] isEqualToString:@".."]) {
-            return @"PDir";
+            return [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode(kGenericFolderIcon)];
         } else if([self fileType:[_fileNamesInCurrentDirectory objectAtIndex:row]] == NSFileTypeDirectory) {
-            return @"Dir";
+            return [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode(kGenericFolderIcon)];
         } else {
-            return @"File";
+            return [NSImage imageNamed:@"play.png"];
+//            return [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode(kGenericCDROMIcon)];
         }
     } else {
         return [_fileNamesInCurrentDirectory objectAtIndex:row];
@@ -150,18 +163,6 @@
 
 
 #pragma mark Mouse event
-
-- (void)createPlayerViewController:(NSInteger)row {
-    NSStoryboard *storyboard = [NSStoryboard storyboardWithName:@"Main" bundle:nil];
-    _playerViewController = [storyboard instantiateControllerWithIdentifier:@"playerViewController"];
-    [_playerViewController presentViewControllerAsModalWindow:_playerViewController];
-    
-    NSString* usableAsURL = [NSString stringWithFormat:@"file://"];
-    usableAsURL = [usableAsURL stringByAppendingString:[self setURLOfFile:[_fileNamesInCurrentDirectory objectAtIndex:row]]];
-    
-    NSURL* fileURL = [NSURL URLWithString:usableAsURL];
-    [_playerViewController loadMediaFile:fileURL];
-}
 
 - (void)doubleClickEvent:(id)sender {
     if ([_tableView selectedRow] != -1) {
@@ -172,11 +173,12 @@
             [self moveToSubDirectory:[_fileNamesInCurrentDirectory objectAtIndex:[_tableView selectedRow]]];
             [_tableView reloadData];
         } else if([self fileType:[_fileNamesInCurrentDirectory objectAtIndex:[_tableView selectedRow]]] == NSFileTypeRegular){
-            [self createPlayerViewController:[_tableView selectedRow]];
+            [self createPlayerViewController:[_fileNamesInCurrentDirectory objectAtIndex:[_tableView selectedRow]]];
         }
     } else {
         NSLog(@"Fail");
     }
+    [self.view.window setTitle:_currentDirectoryURL];
 }
 
 @end
