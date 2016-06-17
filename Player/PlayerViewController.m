@@ -134,7 +134,7 @@ void* StateRepeatIntervalContext = &StateRepeatIntervalContext;
 }
 
 - (void)removeNotifications:(id)playerController {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];;
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context {
