@@ -36,6 +36,12 @@ typedef NS_ENUM(NSInteger, LoadState) {
     LoadStateFailed
 };
 
+typedef NS_ENUM(NSInteger, RateState) {
+    RateStateNormal,
+    RateStateIncrease,
+    RateStateDecrease,
+};
+
 typedef NS_ENUM(NSInteger, VideoGravity) {
     VideoGravityResize,
     VideoGravityResizeAspect,
@@ -44,6 +50,7 @@ typedef NS_ENUM(NSInteger, VideoGravity) {
 
 @property (nonatomic, readonly) PlaybackState playbackState;
 @property (nonatomic, readonly) LoadState loadState;
+@property (nonatomic, readonly) RateState rateState;
 @property (nonatomic) VideoGravity videoGravity;
 
 @property (nonatomic) float rate;

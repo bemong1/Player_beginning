@@ -3,6 +3,7 @@
     <dependencies>
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
+        <capability name="stacking Non-gravity area distributions on NSStackView" minToolsVersion="7.0" minSystemVersion="10.11"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -862,10 +863,10 @@
                                         <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" imagePosition="only" alignment="center" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" id="I7d-Qh-D3c">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
-                                            <connections>
-                                                <action selector="repeatIntervalAction:" target="H6C-rF-ino" id="Pjj-tz-5fw"/>
-                                            </connections>
                                         </buttonCell>
+                                        <connections>
+                                            <action selector="repeatIntervalViewAction:" target="H6C-rF-ino" id="NA7-QQ-cMX"/>
+                                        </connections>
                                     </button>
                                 </subviews>
                                 <constraints>
@@ -1084,6 +1085,30 @@
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="bwZ-ME-mFu">
                                 <rect key="frame" x="175" y="106" width="250" height="50"/>
                                 <subviews>
+                                    <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uee-hZ-yKA">
+                                        <rect key="frame" x="124" y="0.0" width="2" height="50"/>
+                                        <subviews>
+                                            <box horizontalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="pzq-3Q-EfD">
+                                                <rect key="frame" x="-2" y="0.0" width="6" height="50"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="1" id="5a1-9Q-umf"/>
+                                                    <constraint firstAttribute="width" constant="2" id="Pmh-zp-PF7"/>
+                                                </constraints>
+                                                <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                                <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                <font key="titleFont" metaFont="system"/>
+                                            </box>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="2" id="woT-2c-7Gh"/>
+                                        </constraints>
+                                        <visibilityPriorities>
+                                            <integer value="1000"/>
+                                        </visibilityPriorities>
+                                        <customSpacing>
+                                            <real value="3.4028234663852886e+38"/>
+                                        </customSpacing>
+                                    </stackView>
                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="kYE-mD-LDT">
                                         <rect key="frame" x="0.0" y="0.0" width="125" height="50"/>
                                         <buttonCell key="cell" type="smallSquare" title="00:00:00" bezelStyle="smallSquare" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" id="jTw-hW-ZGA">
@@ -1108,11 +1133,14 @@
                                 <constraints>
                                     <constraint firstItem="Xhd-jf-Lch" firstAttribute="top" secondItem="bwZ-ME-mFu" secondAttribute="top" id="5u7-wu-4i9"/>
                                     <constraint firstItem="kYE-mD-LDT" firstAttribute="leading" secondItem="bwZ-ME-mFu" secondAttribute="leading" id="AZM-Ny-yTS"/>
+                                    <constraint firstItem="uee-hZ-yKA" firstAttribute="top" secondItem="bwZ-ME-mFu" secondAttribute="top" id="ECL-wR-VAE"/>
                                     <constraint firstItem="Xhd-jf-Lch" firstAttribute="leading" secondItem="bwZ-ME-mFu" secondAttribute="leading" constant="125" id="IeS-tk-aS9"/>
                                     <constraint firstAttribute="bottom" secondItem="Xhd-jf-Lch" secondAttribute="bottom" id="Oj1-Fc-D1e"/>
                                     <constraint firstItem="kYE-mD-LDT" firstAttribute="top" secondItem="bwZ-ME-mFu" secondAttribute="top" id="R8T-eI-Yw4"/>
                                     <constraint firstAttribute="trailing" secondItem="kYE-mD-LDT" secondAttribute="trailing" constant="125" id="XKF-E7-tw5"/>
                                     <constraint firstAttribute="bottom" secondItem="kYE-mD-LDT" secondAttribute="bottom" id="Xsq-f6-Pzz"/>
+                                    <constraint firstAttribute="bottom" secondItem="uee-hZ-yKA" secondAttribute="bottom" id="ZKw-Gc-fGm"/>
+                                    <constraint firstItem="uee-hZ-yKA" firstAttribute="centerX" secondItem="bwZ-ME-mFu" secondAttribute="centerX" id="bCf-Xv-qaS"/>
                                     <constraint firstAttribute="height" constant="50" id="eJt-g6-gGR"/>
                                     <constraint firstAttribute="trailing" secondItem="Xhd-jf-Lch" secondAttribute="trailing" id="jJn-40-Sw7"/>
                                     <constraint firstAttribute="width" constant="250" id="lNf-ha-2p3"/>

@@ -26,8 +26,7 @@
 
 @property (nonatomic) float startTime;
 @property (nonatomic) float endTime;
-@property (nonatomic) BOOL toggleStartTime;
-@property (nonatomic) BOOL toggleEndTime;
+@property (nonatomic, readonly) BOOL stateRepeatInterval;
 
 - (void)loadMediaFile:(NSURL*)url;
 - (void)stopMediaFile;

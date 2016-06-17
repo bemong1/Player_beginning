@@ -134,6 +134,7 @@
     
     NSString* aFilePathUsingURL = [NSString stringWithFormat:@"file://"];
     aFilePathUsingURL = [aFilePathUsingURL stringByAppendingString:[self setURLOfFile:fileName]];
+    aFilePathUsingURL = [aFilePathUsingURL stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
     
     NSURL* fileURL = [NSURL URLWithString:aFilePathUsingURL];
     [_playerViewController loadMediaFile:fileURL];
