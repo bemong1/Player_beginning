@@ -16,7 +16,6 @@
 
 @property (nonatomic) float minRate;
 @property (nonatomic) float maxRate;
-@property (nonatomic) float currentRate;
 
 @property (nonatomic) float currentVolume;
 

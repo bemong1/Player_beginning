@@ -29,7 +29,6 @@ static void *ItemStatusContext = &ItemStatusContext;
 
 NSString *const PlayerControllerPlaybackStateDidChangeNotification = @"PlayerControllerPlaybackStateDidChangeNotification";
 NSString *const PlayerControllerLoadStateDidChangeNotification = @"PlayerControllerLoadStateDidChangeNotification";
-NSString *const PlayerControllerRateStateDidChangeNotification = @"PlayerControllerRateStateDidChangeNotification";
 NSString *const PlayerControllerPlaybackDidPlayToEndTimeNotification = @"PlayerControllerPlaybackDidPlayToEndTimeNotification";
 
 
@@ -61,12 +60,6 @@ NSString *const PlayerControllerPlaybackDidPlayToEndTimeNotification = @"PlayerC
             });
         }
         return;
-    } else if(context == PlaybackStatusContext) {
-        if(_player.rate == 1.0f) {
-            [self setRateState:RateStateNormal];
-        } else {
-            
-        }
     }
 }
 
@@ -87,16 +80,13 @@ NSString *const PlayerControllerPlaybackDidPlayToEndTimeNotification = @"PlayerC
                 
                 _playerLayer = [AVPlayerLayer playerLayerWithPlayer:_player];
                 _playerLayer.autoresizingMask = kCALayerWidthSizable | kCALayerHeightSizable;
-//                _playerLayer.autoresizingMask = NSViewMinXMargin | NSViewMaxXMargin | NSViewMinYMargin | NSViewMaxYMargin;
                 _playerLayer.frame = self.bounds;
-
                 
                 [self.layer addSublayer:_playerLayer];
                 self.layer.zPosition = -1;
                 
                 [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemDidReachEnd) name:AVPlayerItemDidPlayToEndTimeNotification object:_player.currentItem];
-                [_player.currentItem addObserver:self forKeyPath:@"status" options:0 context:ItemStatusContext];
-                [_player addObserver:self forKeyPath:@"rate" options:0 context:PlaybackStatusContext];
+                [_player.currentItem addObserver:self forKeyPath:@"status" options:0 context:ItemStatusContext];                
                 
                 [self setLoadState:LoadStateLoading];
             } else {
@@ -115,15 +105,15 @@ NSString *const PlayerControllerPlaybackDidPlayToEndTimeNotification = @"PlayerC
 #pragma mark Playback Controller
 
 - (void)play {
-    [_player play];
+    _player.rate = _rate;
     [self setPlaybackState:PlaybackStatePlaying];
-    NSLog(@"play");
+    NSLog(@"Play");
 }
 
 - (void)pause {
-    [_player pause];
+    _player.rate = 0.0f;
     [self setPlaybackState:PlaybackStatePaused];
-    NSLog(@"pause");
+    NSLog(@"Pause");
 }
 
 
@@ -137,11 +127,6 @@ NSString *const PlayerControllerPlaybackDidPlayToEndTimeNotification = @"PlayerC
 - (void)setLoadState:(LoadState)loadState {
     _loadState = loadState;
     [[NSNotificationCenter defaultCenter] postNotificationName:PlayerControllerLoadStateDidChangeNotification object:self];
-}
-
-- (void)setRateState:(RateState)rateState {
-    _rateState = rateState;
-    [[NSNotificationCenter defaultCenter] postNotificationName:PlayerControllerRateStateDidChangeNotification object:self];
 }
 
 - (void)setVideoGravity:(VideoGravity)videoGravity { 
@@ -162,16 +147,12 @@ NSString *const PlayerControllerPlaybackDidPlayToEndTimeNotification = @"PlayerC
 }
 
 - (void)setRate:(float)rate {
-    if(_rate > rate) {
-        [self setRateState:RateStateDecrease];
-        NSLog(@"decrease rate");
-    } else if (_rate < rate) {
-        [self setRateState:RateStateNormal];
-        NSLog(@"increase rate");
+    if(_playbackState == PlaybackStatePlaying) {
+        _player.rate = _rate = rate;
     } else {
-        NSLog(@"what situation??");
+        _rate = rate;
+        
     }
-    _player.rate = _rate = rate;
 }
 
 - (void)setCurrentTime:(float)currentTime {

@@ -84,7 +84,9 @@
 
 @implementation PlayerViewController
 
-void* StateRepeatIntervalContext = &StateRepeatIntervalContext;
+void *StateRepeatIntervalContext = &StateRepeatIntervalContext;
+void *StateRateContext = &StateRateContext;
+
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -134,6 +136,7 @@ void* StateRepeatIntervalContext = &StateRepeatIntervalContext;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPlayerControllerPlaybackDidPlayToEndTimeNotification) name:PlayerControllerPlaybackDidPlayToEndTimeNotification object:playerController];
     
     [self addObserver:self forKeyPath:@"stateRepeatInterval" options:0 context:StateRepeatIntervalContext];
+    [_playerController addObserver:self forKeyPath:@"rate" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:StateRateContext];
 }
 
 - (void)removeNotifications:(id)playerController {
@@ -148,15 +151,21 @@ void* StateRepeatIntervalContext = &StateRepeatIntervalContext;
                 _repeatIntervalTimer = [NSTimer scheduledTimerWithTimeInterval:(0.1) target:self selector:@selector(onRepeatIntervalTime:) userInfo:nil  repeats:YES];
                 [[NSRunLoop mainRunLoop] addTimer:_repeatIntervalTimer forMode:NSRunLoopCommonModes];
             }
+            
         } else {
             [self setAttributeButton:_repeatIntervalButton title:[NSString stringWithFormat:@"A⇄B"] color:[NSColor redColor] font:[NSFont fontWithName:@"Feather" size:21]];
             if([_repeatIntervalTimer isValid]) {
                 [_repeatIntervalTimer invalidate];
                 _repeatIntervalTimer = nil;
             }
-        }
+        } 
         NSLog(@"change");
+    } else if(context == StateRateContext) {
+        if(change[NSKeyValueChangeNewKey] != change[NSKeyValueChangeOldKey]) {
+            NSLog(@"Rate!");
+        }
     }
+    
 }
 
 - (void)onPlayerControllerPlaybackStateDidChangeNotification {
@@ -204,7 +213,7 @@ void* StateRepeatIntervalContext = &StateRepeatIntervalContext;
         _currentTimeViewButton.title = [NSString changeTimeFloatToNSString:_playerController.currentTime];
         _durationTimeViewButton.title = [NSString changeTimeFloatToNSString:_playerController.durationTime];
         
-        _currentRate = 1.0f;
+        [_playerController setRate:1.0f];
         [self playOrPause];
     } else if(_playerController.loadState == LoadStateFailed) {
         [self setEnabledSubControllers:NO];
@@ -242,25 +251,6 @@ void* StateRepeatIntervalContext = &StateRepeatIntervalContext;
 
 
 #pragma mark Playback Controller (getter/setter)
-
-- (void)setCurrentRate:(float)currentRate {
-    if(_currentRate < currentRate) {
-        if(_currentRate < (_maxRate - 0.05f)) {
-            _currentRate = currentRate;
-        } else {
-            _currentRate = _maxRate;
-        }
-    } else {
-        if(_currentRate > (_minRate + 0.05f)) {
-            _currentRate = currentRate;
-        } else {
-            _currentRate = _minRate;
-        }
-    }
-    if(_playerController.playbackState == PlaybackStatePlaying) {
-        [_playerController setRate:_currentRate];
-    }
-}
 
 - (void)setCurrentVolume:(float)currentVolume {
     [_playerController setVolume:_currentVolume];
@@ -302,7 +292,7 @@ void* StateRepeatIntervalContext = &StateRepeatIntervalContext;
 
     [self setNotifications:_playerController];
     
-    [self setViewFrameScale:1.0f];
+    
 }
 
 - (void)stopMediaFile {
@@ -321,15 +311,21 @@ void* StateRepeatIntervalContext = &StateRepeatIntervalContext;
 }
 
 - (void)increasePlaybackRate {
-    [self setCurrentRate: _currentRate + 0.1f];
+    [_playerController setRate:_playerController.rate + 0.1f];
+    if(_playerController.rate > (_maxRate - 0.05f)) {
+        _playerController.rate = _maxRate;
+    }
 }
 
 - (void)restorePlaybackRate {
-    [self setCurrentRate:1.0f];
+    [_playerController setRate:1.0f];
 }
 
 - (void)decreasePlaybackRate {
-    [self setCurrentRate: _currentRate - 0.1f];
+    [_playerController setRate:_playerController.rate - 0.1f];
+    if(_playerController.rate < (_minRate + 0.05f)) {
+        _playerController.rate = _minRate;
+    }
 }
 
 - (void)changeVideoGravity {
@@ -375,17 +371,17 @@ void* StateRepeatIntervalContext = &StateRepeatIntervalContext;
 
 - (IBAction)increasePlaybackRateAction:(id)sender {
     [self increasePlaybackRate];
-    [self setAttributeButton:_restorePlaybackRateButton title:[NSString stringWithFormat:@"%.1fx", _currentRate] color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:23]];
+    [self setAttributeButton:_restorePlaybackRateButton title:[NSString stringWithFormat:@"%.1fx", _playerController.rate] color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:23]];
 }
 
 - (IBAction)restorePlaybackRateAction:(id)sender {
     [self restorePlaybackRate];
-    [self setAttributeButton:_restorePlaybackRateButton title:[NSString stringWithFormat:@"%.1fx", _currentRate] color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:23]];
+    [self setAttributeButton:_restorePlaybackRateButton title:[NSString stringWithFormat:@"%.1fx", _playerController.rate] color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:23]];
 }
 
 - (IBAction)decreasePlaybackRateAction:(id)sender {
     [self decreasePlaybackRate];
-    [self setAttributeButton:_restorePlaybackRateButton title:[NSString stringWithFormat:@"%.1fx", _currentRate] color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:23]];
+    [self setAttributeButton:_restorePlaybackRateButton title:[NSString stringWithFormat:@"%.1fx", _playerController.rate] color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:23]];
 }
 
 - (IBAction)stepForwardAction:(id)sender {
