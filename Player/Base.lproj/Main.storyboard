@@ -868,6 +868,20 @@
                                             <action selector="repeatIntervalViewAction:" target="H6C-rF-ino" id="NA7-QQ-cMX"/>
                                         </connections>
                                     </button>
+                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="anW-ja-qfA">
+                                        <rect key="frame" x="376" y="7" width="50" height="50"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="50" id="9Uu-S0-Jey"/>
+                                            <constraint firstAttribute="height" constant="50" id="eEZ-NY-fqC"/>
+                                        </constraints>
+                                        <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" imagePosition="only" alignment="center" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" id="ODT-zI-nH0">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <connections>
+                                            <action selector="changeVideoResizeButton:" target="H6C-rF-ino" id="b75-R0-3Fo"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <constraints>
                                     <constraint firstItem="LfM-Om-md7" firstAttribute="leading" secondItem="iA8-Pl-2gR" secondAttribute="trailing" constant="8" id="2EJ-CX-iSd"/>
@@ -875,6 +889,7 @@
                                     <constraint firstItem="H9L-6X-ZSN" firstAttribute="leading" secondItem="r31-0Z-BSA" secondAttribute="trailing" constant="8" id="9wc-ue-2Ev"/>
                                     <constraint firstAttribute="trailing" secondItem="H9L-6X-ZSN" secondAttribute="trailing" id="DIx-db-OOU"/>
                                     <constraint firstAttribute="height" constant="57" id="OXx-fd-GYr"/>
+                                    <constraint firstItem="qz6-uU-ZiD" firstAttribute="leading" secondItem="anW-ja-qfA" secondAttribute="trailing" constant="8" id="Oa5-te-iq0"/>
                                     <constraint firstItem="r31-0Z-BSA" firstAttribute="leading" secondItem="qz6-uU-ZiD" secondAttribute="trailing" constant="8" id="QUx-eh-ABH"/>
                                     <constraint firstItem="R0m-sZ-Zis" firstAttribute="top" secondItem="1Px-YM-COs" secondAttribute="top" id="ZO9-Qq-WAD"/>
                                     <constraint firstItem="r31-0Z-BSA" firstAttribute="leading" secondItem="qz6-uU-ZiD" secondAttribute="trailing" constant="8" id="d9c-9v-f3T"/>
@@ -887,6 +902,7 @@
                                     <constraint firstItem="iA8-Pl-2gR" firstAttribute="leading" secondItem="R0m-sZ-Zis" secondAttribute="trailing" constant="8" id="qQd-CO-YKe"/>
                                     <constraint firstItem="R0m-sZ-Zis" firstAttribute="leading" secondItem="1Px-YM-COs" secondAttribute="leading" id="rkj-rl-LYR"/>
                                     <constraint firstItem="H9L-6X-ZSN" firstAttribute="top" secondItem="1Px-YM-COs" secondAttribute="top" id="rlx-6Y-oas"/>
+                                    <constraint firstItem="anW-ja-qfA" firstAttribute="top" secondItem="1Px-YM-COs" secondAttribute="top" id="smh-Wk-8HW"/>
                                     <constraint firstItem="iA8-Pl-2gR" firstAttribute="leading" secondItem="R0m-sZ-Zis" secondAttribute="trailing" constant="8" id="uJE-wb-aTH"/>
                                     <constraint firstItem="r31-0Z-BSA" firstAttribute="leading" secondItem="qz6-uU-ZiD" secondAttribute="trailing" constant="8" id="vrl-B5-z7H"/>
                                     <constraint firstItem="r31-0Z-BSA" firstAttribute="top" secondItem="1Px-YM-COs" secondAttribute="top" id="x9Z-Iq-oJ9"/>
@@ -1163,6 +1179,7 @@
                     <connections>
                         <outlet property="bottomView" destination="r62-mZ-dWz" id="9ed-XB-d31"/>
                         <outlet property="changeVideoGravityButton" destination="H9L-6X-ZSN" id="eUi-fy-zhJ"/>
+                        <outlet property="changeVideoResizeButton" destination="anW-ja-qfA" id="sEd-K1-9Fh"/>
                         <outlet property="currentTimeViewButton" destination="nyT-g2-yg6" id="f96-Vj-8tB"/>
                         <outlet property="decreasePlaybackRateButton" destination="LfM-Om-md7" id="3tD-IM-N2s"/>
                         <outlet property="durationTimeViewButton" destination="dcE-QH-hT8" id="UZI-nn-dPA"/>

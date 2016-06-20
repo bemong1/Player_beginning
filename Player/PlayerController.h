@@ -20,8 +20,7 @@ extern NSString *const PlayerControllerPlaybackDidPlayToEndTimeNotification;
 
 #pragma mark Init
 
--(id)initWithMediaFileURL:(NSURL*)fileURL andRect:(NSRect)frameRect;
-
+- (id)initWithMediaFileURL:(NSURL*)fileURL andRect:(NSRect)frameRect;
 
 #pragma mark Playback Controller
 
@@ -48,6 +47,8 @@ typedef NS_ENUM(NSInteger, VideoGravity) {
     VideoGravityResizeAspectFill
 };
 
+@property (nonatomic, readonly) CGSize originalSize;
+
 @property (nonatomic, readonly) PlaybackState playbackState;
 @property (nonatomic, readonly) LoadState loadState;
 @property (nonatomic, readonly) RateState rateState;
@@ -60,5 +61,6 @@ typedef NS_ENUM(NSInteger, VideoGravity) {
 
 - (void)play;
 - (void)pause;
+
 
 @end

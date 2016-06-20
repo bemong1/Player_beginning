@@ -42,6 +42,7 @@
 @property (strong) IBOutlet NSButton *toggleShuffleModeButton;
 
 @property (strong) IBOutlet NSButton *changeVideoGravityButton;
+@property (strong) IBOutlet NSButton *changeVideoResizeButton;
 
 @property (strong) IBOutlet NSSlider *seekBarSlider;
 @property (strong) IBOutlet NSSlider *volumeBarSlider;
@@ -68,7 +69,9 @@
 - (IBAction)toggleRepeatModeAction:(id)sender;
 - (IBAction)toggleMuteModeAction:(id)sender;
 - (IBAction)toggleShuffleModeAction:(id)sender;
+
 - (IBAction)changeVideoGravityAction:(id)sender;
+- (IBAction)changeVideoResizeButton:(id)sender;
 
 - (IBAction)seekBarAction:(id)sender;
 - (IBAction)volumeBarAction:(id)sender;
@@ -276,10 +279,30 @@ void* StateRepeatIntervalContext = &StateRepeatIntervalContext;
 
 #pragma mark API
 
-- (void)loadMediaFile:(NSURL*)url {    
+- (void)setViewFrameScale:(float)scale {
+    [self.view willRemoveSubview:_playerController];
+    
+    _playerController.autoresizingMask = NSViewNotSizable;
+    
+    [_playerController setFrameSize:NSMakeSize(_playerController.originalSize.width * scale, _playerController.originalSize.height * scale)];
+    [_playerController setFrame:NSMakeRect((self.view.window.frame.size.width - _playerController.frame.size.width) * (1/2.),
+                                           (self.view.window.frame.size.height - _playerController.frame.size.height) * (1/2.),
+                                           _playerController.frame.size.width,
+                                           _playerController.frame.size.height)];
+    
+    _playerController.autoresizingMask = NSViewMinXMargin | NSViewMaxXMargin | NSViewMinYMargin | NSViewMaxYMargin;
+
+    NSLog(@"%f, %f", _playerController.frame.origin.x, _playerController.frame.origin.y);
+}
+
+- (void)loadMediaFile:(NSURL*)url {
     _playerController = [[PlayerController alloc]initWithMediaFileURL:url andRect:self.view.bounds];
     [self.view addSubview:_playerController];
+    [self.view.window setContentSize:[_playerController originalSize]];
+
     [self setNotifications:_playerController];
+    
+    [self setViewFrameScale:1.0f];
 }
 
 - (void)stopMediaFile {
@@ -321,6 +344,13 @@ void* StateRepeatIntervalContext = &StateRepeatIntervalContext;
             _playerController.videoGravity = VideoGravityResizeAspect;
             break;
     }
+}
+
+- (void)changeVideoResize {
+    static int scale;
+    scale ++;
+    scale = scale % 4;
+    [self setViewFrameScale:(float)scale + 1.0f];
 }
 
 - (void)stepBackward {
@@ -381,10 +411,6 @@ void* StateRepeatIntervalContext = &StateRepeatIntervalContext;
     }
 }
 
-- (IBAction)changeVideoGravityAction:(id)sender {
-    [self changeVideoGravity];
-}
-
 - (IBAction)toggleRepeatModeAction:(id)sender {
     if(_repeat == NO) {
         [self setAttributeButton:_toggleRepeatModeButton  title:@"" color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:25]];
@@ -412,6 +438,14 @@ void* StateRepeatIntervalContext = &StateRepeatIntervalContext;
         _volumeBarSlider.floatValue = _currentVolume;
     }
     [self setMute:!_mute];
+}
+
+- (IBAction)changeVideoGravityAction:(id)sender {
+    [self changeVideoGravity];
+}
+
+- (IBAction)changeVideoResizeButton:(id)sender {
+    [self changeVideoResize];
 }
 
 - (IBAction)repeatIntervalViewAction:(id)sender {
@@ -509,6 +543,7 @@ void* StateRepeatIntervalContext = &StateRepeatIntervalContext;
     [self setAttributeButton:_decreasePlaybackRateButton title:@"" color:[NSColor blueColor] font:font];
     [self setAttributeButton:_toggleMuteModeButton title:@"" color:[NSColor blueColor] font:[NSFont fontWithName:@"Pe-icon-7-stroke" size:30]];
     [self setAttributeButton:_repeatIntervalButton title:[NSString stringWithFormat:@"A⇄B"] color:[NSColor redColor] font:[NSFont fontWithName:@"Feather" size:21]];
+    [self setAttributeButton:_changeVideoResizeButton title:@"" color:[NSColor blueColor] font:font];
 }
 
 - (void)setEnabledSubControllers:(BOOL)flag {

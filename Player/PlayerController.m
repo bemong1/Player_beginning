@@ -74,6 +74,8 @@ NSString *const PlayerControllerPlaybackDidPlayToEndTimeNotification = @"PlayerC
     AVURLAsset *asset= [AVURLAsset URLAssetWithURL:fileURL options:nil];
     NSString *tracksKey = @"tracks";
     
+    _originalSize = [[asset tracksWithMediaType:AVMediaTypeVideo][0] naturalSize];;
+    
     [asset loadValuesAsynchronouslyForKeys:@[tracksKey] completionHandler:^() {
         dispatch_async(dispatch_get_main_queue(), ^ {
             NSError *error;
@@ -85,7 +87,10 @@ NSString *const PlayerControllerPlaybackDidPlayToEndTimeNotification = @"PlayerC
                 
                 _playerLayer = [AVPlayerLayer playerLayerWithPlayer:_player];
                 _playerLayer.autoresizingMask = kCALayerWidthSizable | kCALayerHeightSizable;
+//                _playerLayer.autoresizingMask = NSViewMinXMargin | NSViewMaxXMargin | NSViewMinYMargin | NSViewMaxYMargin;
                 _playerLayer.frame = self.bounds;
+
+                
                 [self.layer addSublayer:_playerLayer];
                 self.layer.zPosition = -1;
                 
