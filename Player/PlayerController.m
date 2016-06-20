@@ -90,7 +90,7 @@ NSString *const PlayerControllerPlaybackDidPlayToEndTimeNotification = @"PlayerC
                 
             } else {
                 [self setLoadState:LoadStateFailed];
-                NSLog(@"Fail");
+                NSLog(@"%@", error);
             }
         });
     }];

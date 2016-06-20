@@ -130,31 +130,23 @@ void *StateRateContext = &StateRateContext;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPlayerControllerLoadStateDidChangeNotification) name:PlayerControllerLoadStateDidChangeNotification object:videoPlayerController];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPlayerControllerPlaybackDidPlayToEndTimeNotification) name:PlayerControllerPlaybackDidPlayToEndTimeNotification object:videoPlayerController];
     
-    [self addObserver:self forKeyPath:@"stateRepeatInterval" options:0 context:StateRepeatIntervalContext];
+    [videoPlayerController addObserver:self forKeyPath:@"stateRepeatInterval" options:0 context:StateRepeatIntervalContext];
     [videoPlayerController addObserver:self forKeyPath:@"rate" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:StateRateContext];
 }
 
 - (void)removeNotifications:(id)videoPlayerController {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
-    [self removeObserver:self forKeyPath:@"stateRepeatInterval"];
+    [videoPlayerController removeObserver:self forKeyPath:@"stateRepeatInterval"];
     [videoPlayerController removeObserver:self forKeyPath:@"rate"];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context {
     if(context == StateRepeatIntervalContext) {
-        if(_stateRepeatInterval == YES) {
+        if(_videoPlayerController.stateRepeatInterval == YES) {
             [self setAttributeButton:_repeatIntervalButton title:[NSString stringWithFormat:@"A⇄B"] color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:21]];
-            if(_repeatIntervalTimer == nil) {
-                _repeatIntervalTimer = [NSTimer scheduledTimerWithTimeInterval:(0.1) target:self selector:@selector(onRepeatIntervalTime:) userInfo:nil  repeats:YES];
-                [[NSRunLoop mainRunLoop] addTimer:_repeatIntervalTimer forMode:NSRunLoopCommonModes];
-            }
         } else {
             [self setAttributeButton:_repeatIntervalButton title:[NSString stringWithFormat:@"A⇄B"] color:[NSColor redColor] font:[NSFont fontWithName:@"Feather" size:21]];
-            if([_repeatIntervalTimer isValid]) {
-                [_repeatIntervalTimer invalidate];
-                _repeatIntervalTimer = nil;
-            }
         } 
         NSLog(@"change");
     } else if(context == StateRateContext) {
@@ -199,7 +191,7 @@ void *StateRateContext = &StateRateContext;
         [_repeatIntervalStartButton.layer backgroundColorRed:0.5f green:0.0f blue:0.0f alpha:0.5f];
         [self setAttributeButton:_repeatIntervalEndButton title:[NSString changeTimeFloatToNSString:_videoPlayerController.durationTime] color:[NSColor blackColor] font:[NSFont fontWithName:@"Feather" size:25]];
         [_repeatIntervalEndButton.layer backgroundColorRed:0.5f green:0.0f blue:0.0f alpha:0.5f];
-        _endTime = _videoPlayerController.durationTime;
+        _videoPlayerController.endTime = _videoPlayerController.durationTime;
         
         [_loadStateProgressIndicator stopAnimation:nil];
         _loadStateProgressIndicator.hidden = YES;
@@ -224,8 +216,8 @@ void *StateRateContext = &StateRateContext;
         [_videoPlayerController setCurrentTime:0.0f];
         [_videoPlayerController play];
     }
-    if(_stateRepeatInterval == YES) {
-        [_videoPlayerController setCurrentTime:_startTime];
+    if(_videoPlayerController.stateRepeatInterval == YES) {
+        [_videoPlayerController setCurrentTime:_videoPlayerController.startTime];
         [_videoPlayerController play];
     }
 }
@@ -235,15 +227,6 @@ void *StateRateContext = &StateRateContext;
     _currentTimeViewButton.title = [NSString changeTimeFloatToNSString:_videoPlayerController.currentTime];
     _durationTimeViewButton.title = [NSString changeTimeFloatToNSString:_videoPlayerController.durationTime];
 }
-
-- (void)onRepeatIntervalTime:(NSTimer*)timer {
-    if(_startTime - 0.01f > _seekBarSlider.floatValue || _endTime < _seekBarSlider.floatValue) {
-        _videoPlayerController.currentTime = _startTime;
-        _seekBarSlider.floatValue = _startTime;
-    }
-    NSLog(@"start:%f, current:%f, end:%f", _startTime, _seekBarSlider.floatValue, _endTime);
-}
-
 
 
 - (void)loadMediaFile:(NSURL*)url {
@@ -259,8 +242,6 @@ void *StateRateContext = &StateRateContext;
     [_videoPlayerController removeFromSuperviewWithoutNeedingDisplay];
     _videoPlayerController = nil;
 }
-
-
 
 
 #pragma mark Playback Controller Button
@@ -280,7 +261,6 @@ void *StateRateContext = &StateRateContext;
 
 - (IBAction)restorePlaybackRateAction:(id)sender {
     [_videoPlayerController restorePlaybackRate];
-    
 }
 
 - (IBAction)decreasePlaybackRateAction:(id)sender {
@@ -356,53 +336,33 @@ void *StateRateContext = &StateRateContext;
 }
 
 - (IBAction)repeatIntervalStartAction:(id)sender {
-    if(_startTime != 0.0f) {
+    if(_videoPlayerController.startTime != 0.0f) {
         [_repeatIntervalStartButton.layer backgroundColorRed:0.5f green:0.0f blue:0.0f alpha:0.5f];
-        [self setStartTime:0.0f];
+        [_videoPlayerController setStartTime:0.0f];
     } else {
-        if(_seekBarSlider.floatValue == 0.0f) {
+        if(_videoPlayerController.currentTime == 0.0f) {
             return;
         }
         [_repeatIntervalStartButton.layer backgroundColorRed:0.0f green:0.0f blue:0.5f alpha:0.5f];
-        [self setStartTime:_seekBarSlider.floatValue];
+        [_videoPlayerController setStartTime:_seekBarSlider.floatValue];
     }
-    [self setAttributeButton:_repeatIntervalStartButton title:[NSString changeTimeFloatToNSString:_startTime] color:[NSColor blackColor] font:[NSFont fontWithName:@"Feather" size:25]];
+    [self setAttributeButton:_repeatIntervalStartButton title:[NSString changeTimeFloatToNSString:_videoPlayerController.startTime] color:[NSColor blackColor] font:[NSFont fontWithName:@"Feather" size:25]];
 }
 
 - (IBAction)repeatIntervalEndAction:(id)sender {
-    if(_endTime != _videoPlayerController.durationTime) {
+    if(_videoPlayerController.endTime != _videoPlayerController.durationTime) {
         [_repeatIntervalEndButton.layer backgroundColorRed:0.5f green:0.0f blue:0.0f alpha:0.5f];
-        [self setEndTime:_videoPlayerController.durationTime];
+        [_videoPlayerController setEndTime:_videoPlayerController.durationTime];
     } else {
-        if(_seekBarSlider.floatValue == _videoPlayerController.durationTime) {
+        if(_videoPlayerController.currentTime == _videoPlayerController.durationTime) {
             return;
         }
         [_repeatIntervalEndButton.layer backgroundColorRed:0.0f green:0.0f blue:0.5f alpha:0.5f];
-        [self setEndTime:_seekBarSlider.floatValue];
+        [_videoPlayerController setEndTime:_seekBarSlider.floatValue];
     }
-    [self setAttributeButton:_repeatIntervalEndButton title:[NSString changeTimeFloatToNSString:_endTime] color:[NSColor blackColor] font:[NSFont fontWithName:@"Feather" size:25]];
+    [self setAttributeButton:_repeatIntervalEndButton title:[NSString changeTimeFloatToNSString:_videoPlayerController.endTime] color:[NSColor blackColor] font:[NSFont fontWithName:@"Feather" size:25]];
 }
 
-- (void)setStartTime:(float)startTime {
-    _startTime = startTime;
-    if(_startTime != 0.0f || _endTime != _videoPlayerController.durationTime) {
-        [self setStateRepeatInterval:YES];
-    } else {
-        [self setStateRepeatInterval:NO];
-    }
-}
-- (void)setEndTime:(float)endTime {
-    _endTime = endTime;
-    if(_startTime != 0.0f || _endTime != _videoPlayerController.durationTime) {
-        [self setStateRepeatInterval:YES];
-    } else {
-        [self setStateRepeatInterval:NO];
-    }
-}
-
-- (void)setStateRepeatInterval:(BOOL)stateRepeatInterval {
-    _stateRepeatInterval = stateRepeatInterval;
-}
 
 
 #pragma mark Mouse event

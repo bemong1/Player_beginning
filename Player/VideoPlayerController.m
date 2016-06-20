@@ -10,6 +10,11 @@
 
 #import "CALayer+AddMethod.h"
 
+@interface VideoPlayerController ()
+@property (strong) NSTimer *repeatIntervalTimer;
+@end
+
+
 @implementation VideoPlayerController
 
 - (id)initWithMediaFileURL:(NSURL*)fileURL andRect:(NSRect)frameRect {
@@ -17,7 +22,7 @@
     if (self != nil) {
         _currentVolume = 1.0f;
         _minRate = 0.5f;
-        _maxRate = 2.0f;
+        _maxRate = 2.0f;        
     }
     return self;
 }
@@ -69,6 +74,7 @@
 }
 
 - (void)changeVideoGravity {
+//    self.autoresizingMask = kCALayerWidthSizable | kCALayerHeightSizable;
     switch(self.videoGravity) {
         case VideoGravityResize:
             self.videoGravity = VideoGravityResizeAspectFill;
@@ -80,6 +86,46 @@
             self.videoGravity = VideoGravityResizeAspect;
             break;
     }
+}
+
+- (void)setStartTime:(float)startTime {
+    _startTime = startTime;
+    if(_startTime != 0.0f || _endTime != self.durationTime) {
+        [self setStateRepeatInterval:YES];
+    } else {
+        [self setStateRepeatInterval:NO];
+    }
+}
+
+- (void)setEndTime:(float)endTime {
+    _endTime = endTime;
+    if(_startTime != 0.0f || _endTime != self.durationTime) {
+        [self setStateRepeatInterval:YES];
+    } else {
+        [self setStateRepeatInterval:NO];
+    }
+}
+
+- (void)setStateRepeatInterval:(BOOL)stateRepeatInterval {
+    if(stateRepeatInterval == YES) {
+        if(_repeatIntervalTimer == nil) {
+            _repeatIntervalTimer = [NSTimer scheduledTimerWithTimeInterval:(0.1) target:self selector:@selector(onRepeatIntervalTime:) userInfo:nil  repeats:YES];
+            [[NSRunLoop mainRunLoop] addTimer:_repeatIntervalTimer forMode:NSRunLoopCommonModes];
+        }
+    } else {
+        if([_repeatIntervalTimer isValid]) {
+            [_repeatIntervalTimer invalidate];
+            _repeatIntervalTimer = nil;
+        }
+    }
+    _stateRepeatInterval = stateRepeatInterval;
+}
+
+- (void)onRepeatIntervalTime:(NSTimer*)timer {
+    if(self.startTime - 0.01f > self.currentTime || self.endTime < self.currentTime) {
+        self.currentTime = self.startTime;
+    }
+    NSLog(@"start:%f, current:%f, end:%f", self.startTime, self.currentTime, self.endTime);
 }
 
 - (void)changeVideoResize {

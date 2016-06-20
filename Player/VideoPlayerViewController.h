@@ -15,11 +15,6 @@
 
 @property (nonatomic) VideoPlayerController *videoPlayerController;
 
-
-@property (nonatomic) float startTime;
-@property (nonatomic) float endTime;
-@property (nonatomic, readonly) BOOL stateRepeatInterval;
-
 - (void)loadMediaFile:(NSURL*)url;
 - (void)stopMediaFile;
 
