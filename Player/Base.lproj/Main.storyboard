@@ -747,10 +747,10 @@
             </objects>
             <point key="canvasLocation" x="75" y="737"/>
         </scene>
-        <!--Movie Player View Controller-->
+        <!--Video Player View Controller-->
         <scene sceneID="12p-Yo-zFM">
             <objects>
-                <viewController storyboardIdentifier="playerViewController" id="H6C-rF-ino" customClass="MoviePlayerViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="playerViewController" id="H6C-rF-ino" customClass="VideoPlayerViewController" sceneMemberID="viewController">
                     <view key="view" id="1oh-e8-VLY">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="360"/>
                         <autoresizingMask key="autoresizingMask"/>

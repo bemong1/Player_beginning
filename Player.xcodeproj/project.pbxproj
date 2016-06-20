@@ -7,19 +7,22 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E03141281D17BDB6005286EE /* VideoPlayerController.m in Sources */ = {isa = PBXBuildFile; fileRef = E03141271D17BDB6005286EE /* VideoPlayerController.m */; };
 		E0368D911D0E8D4D008C92CB /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E0368D901D0E8D4D008C92CB /* AppDelegate.m */; };
 		E0368D941D0E8D4D008C92CB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E0368D931D0E8D4D008C92CB /* main.m */; };
 		E0368D971D0E8D4D008C92CB /* MediaFileExplorer.m in Sources */ = {isa = PBXBuildFile; fileRef = E0368D961D0E8D4D008C92CB /* MediaFileExplorer.m */; };
 		E0368D991D0E8D4D008C92CB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E0368D981D0E8D4D008C92CB /* Assets.xcassets */; };
 		E0368D9C1D0E8D4D008C92CB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E0368D9A1D0E8D4D008C92CB /* Main.storyboard */; };
 		E0D0E91D1D10F66300F0D4CF /* PlayerController.m in Sources */ = {isa = PBXBuildFile; fileRef = E0D0E9121D10F66300F0D4CF /* PlayerController.m */; };
-		E0D0E91E1D10F66300F0D4CF /* MoviePlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E0D0E9141D10F66300F0D4CF /* MoviePlayerViewController.m */; };
+		E0D0E91E1D10F66300F0D4CF /* VideoPlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E0D0E9141D10F66300F0D4CF /* VideoPlayerViewController.m */; };
 		E0D0E9211D10F66300F0D4CF /* CALayer+AddMethod.m in Sources */ = {isa = PBXBuildFile; fileRef = E0D0E91A1D10F66300F0D4CF /* CALayer+AddMethod.m */; };
 		E0D0E9221D10F66300F0D4CF /* NSString+AddMethod.m in Sources */ = {isa = PBXBuildFile; fileRef = E0D0E91C1D10F66300F0D4CF /* NSString+AddMethod.m */; };
 		E0D0E9271D1238A200F0D4CF /* play.png in Resources */ = {isa = PBXBuildFile; fileRef = E0D0E9261D1238A100F0D4CF /* play.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		E03141261D17BDB6005286EE /* VideoPlayerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoPlayerController.h; sourceTree = "<group>"; };
+		E03141271D17BDB6005286EE /* VideoPlayerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VideoPlayerController.m; sourceTree = "<group>"; };
 		E0368D8C1D0E8D4D008C92CB /* Player.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Player.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E0368D8F1D0E8D4D008C92CB /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		E0368D901D0E8D4D008C92CB /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -32,8 +35,8 @@
 		E0D0E9101D0FBAC000F0D4CF /* feather-webfont.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "feather-webfont.ttf"; sourceTree = "<group>"; };
 		E0D0E9111D10F66300F0D4CF /* PlayerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlayerController.h; sourceTree = "<group>"; };
 		E0D0E9121D10F66300F0D4CF /* PlayerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlayerController.m; sourceTree = "<group>"; };
-		E0D0E9131D10F66300F0D4CF /* MoviePlayerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoviePlayerViewController.h; sourceTree = "<group>"; };
-		E0D0E9141D10F66300F0D4CF /* MoviePlayerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoviePlayerViewController.m; sourceTree = "<group>"; };
+		E0D0E9131D10F66300F0D4CF /* VideoPlayerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoPlayerViewController.h; sourceTree = "<group>"; };
+		E0D0E9141D10F66300F0D4CF /* VideoPlayerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VideoPlayerViewController.m; sourceTree = "<group>"; };
 		E0D0E9191D10F66300F0D4CF /* CALayer+AddMethod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CALayer+AddMethod.h"; sourceTree = "<group>"; };
 		E0D0E91A1D10F66300F0D4CF /* CALayer+AddMethod.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CALayer+AddMethod.m"; sourceTree = "<group>"; };
 		E0D0E91B1D10F66300F0D4CF /* NSString+AddMethod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+AddMethod.h"; sourceTree = "<group>"; };
@@ -77,8 +80,10 @@
 				E0368D961D0E8D4D008C92CB /* MediaFileExplorer.m */,
 				E0D0E9111D10F66300F0D4CF /* PlayerController.h */,
 				E0D0E9121D10F66300F0D4CF /* PlayerController.m */,
-				E0D0E9131D10F66300F0D4CF /* MoviePlayerViewController.h */,
-				E0D0E9141D10F66300F0D4CF /* MoviePlayerViewController.m */,
+				E03141261D17BDB6005286EE /* VideoPlayerController.h */,
+				E03141271D17BDB6005286EE /* VideoPlayerController.m */,
+				E0D0E9131D10F66300F0D4CF /* VideoPlayerViewController.h */,
+				E0D0E9141D10F66300F0D4CF /* VideoPlayerViewController.m */,
 				E0D0E9191D10F66300F0D4CF /* CALayer+AddMethod.h */,
 				E0D0E91A1D10F66300F0D4CF /* CALayer+AddMethod.m */,
 				E0D0E91B1D10F66300F0D4CF /* NSString+AddMethod.h */,
@@ -174,10 +179,11 @@
 				E0368D971D0E8D4D008C92CB /* MediaFileExplorer.m in Sources */,
 				E0D0E9221D10F66300F0D4CF /* NSString+AddMethod.m in Sources */,
 				E0368D941D0E8D4D008C92CB /* main.m in Sources */,
+				E03141281D17BDB6005286EE /* VideoPlayerController.m in Sources */,
 				E0D0E91D1D10F66300F0D4CF /* PlayerController.m in Sources */,
 				E0368D911D0E8D4D008C92CB /* AppDelegate.m in Sources */,
 				E0D0E9211D10F66300F0D4CF /* CALayer+AddMethod.m in Sources */,
-				E0D0E91E1D10F66300F0D4CF /* MoviePlayerViewController.m in Sources */,
+				E0D0E91E1D10F66300F0D4CF /* VideoPlayerViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

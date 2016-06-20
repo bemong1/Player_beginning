@@ -1,18 +1,16 @@
 //
-//  PlayerViewController.h
-//  Player-0610
+//  MoviePlayerController.h
+//  Player
 //
-//  Created by kwk on 2016. 6. 10..
+//  Created by kwk on 2016. 6. 20..
 //  Copyright © 2016년 kwk.self. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
-
 #import "PlayerController.h"
 
-@interface MoviePlayerViewController : NSViewController
+@interface VideoPlayerController : PlayerController
 
-@property (nonatomic) PlayerController *playerController;
+- (id)initWithMediaFileURL:(NSURL*)fileURL andRect:(NSRect)frameRect;
 
 @property (nonatomic) float minRate;
 @property (nonatomic) float maxRate;
@@ -27,8 +25,6 @@
 @property (nonatomic) float endTime;
 @property (nonatomic, readonly) BOOL stateRepeatInterval;
 
-- (void)loadMediaFile:(NSURL*)url;
-- (void)stopMediaFile;
 
 - (void)playOrPause;
 
@@ -36,8 +32,11 @@
 - (void)restorePlaybackRate;
 - (void)decreasePlaybackRate;
 - (void)changeVideoGravity;
+- (void)changeVideoResize;
+
 
 - (void)stepBackward;
 - (void)stepForward;
+
 
 @end

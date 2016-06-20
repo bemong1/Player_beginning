@@ -1,4 +1,4 @@
-//
+
 //  PlayerViewController.m
 //  Player-0610
 //
@@ -6,14 +6,14 @@
 //  Copyright © 2016년 kwk.self. All rights reserved.
 //
 
-#import "MoviePlayerViewController.h"
+#import "VideoPlayerViewController.h"
 #import "URLList.h"
 
 #import "CALayer+AddMethod.h"
 #import "NSString+AddMethod.h"
 
 
-@interface MoviePlayerViewController ()
+@interface VideoPlayerViewController ()
 
 @property (strong) IBOutlet NSView *topView;
 @property (strong) IBOutlet NSView *bottomView;
@@ -82,7 +82,7 @@
 
 @end
 
-@implementation MoviePlayerViewController
+@implementation VideoPlayerViewController
 
 void *StateRepeatIntervalContext = &StateRepeatIntervalContext;
 void *StateRateContext = &StateRateContext;
@@ -109,16 +109,11 @@ void *StateRateContext = &StateRateContext;
     [_seekBarSlider sendActionOn:NSLeftMouseDownMask|NSLeftMouseDraggedMask|NSLeftMouseUpMask];
     [_volumeBarSlider sendActionOn:NSLeftMouseDownMask|NSLeftMouseDraggedMask|NSLeftMouseUpMask];
     
-    _currentTimeViewButton.title = [NSString changeTimeFloatToNSString:_playerController.currentTime];
-    _durationTimeViewButton.title = [NSString changeTimeFloatToNSString:_playerController.durationTime];
+    _currentTimeViewButton.title = [NSString changeTimeFloatToNSString:_videoPlayerController.currentTime];
+    _durationTimeViewButton.title = [NSString changeTimeFloatToNSString:_videoPlayerController.durationTime];
     
     _seekBarSlider.floatValue = 0.0f;
     _volumeBarSlider.floatValue = 1.0f;
-
-    _currentVolume = 1.0f;
-    
-    _minRate = 0.5f;
-    _maxRate = 2.0f;
 }
 
 - (void)dealloc {
@@ -130,20 +125,20 @@ void *StateRateContext = &StateRateContext;
     [self stopMediaFile];
 }
 
-- (void)setNotifications:(id)playerController {
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPlayerControllerPlaybackStateDidChangeNotification) name:PlayerControllerPlaybackStateDidChangeNotification object:playerController];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPlayerControllerLoadStateDidChangeNotification) name:PlayerControllerLoadStateDidChangeNotification object:playerController];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPlayerControllerPlaybackDidPlayToEndTimeNotification) name:PlayerControllerPlaybackDidPlayToEndTimeNotification object:playerController];
+- (void)setNotifications:(id)videoPlayerController {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPlayerControllerPlaybackStateDidChangeNotification) name:PlayerControllerPlaybackStateDidChangeNotification object:videoPlayerController];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPlayerControllerLoadStateDidChangeNotification) name:PlayerControllerLoadStateDidChangeNotification object:videoPlayerController];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPlayerControllerPlaybackDidPlayToEndTimeNotification) name:PlayerControllerPlaybackDidPlayToEndTimeNotification object:videoPlayerController];
     
     [self addObserver:self forKeyPath:@"stateRepeatInterval" options:0 context:StateRepeatIntervalContext];
-    [_playerController addObserver:self forKeyPath:@"rate" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:StateRateContext];
+    [videoPlayerController addObserver:self forKeyPath:@"rate" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:StateRateContext];
 }
 
-- (void)removeNotifications:(id)playerController {
+- (void)removeNotifications:(id)videoPlayerController {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
     [self removeObserver:self forKeyPath:@"stateRepeatInterval"];
-    [_playerController removeObserver:self forKeyPath:@"rate"];
+    [videoPlayerController removeObserver:self forKeyPath:@"rate"];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context {
@@ -164,7 +159,7 @@ void *StateRateContext = &StateRateContext;
         NSLog(@"change");
     } else if(context == StateRateContext) {
         if(change[NSKeyValueChangeNewKey] != change[NSKeyValueChangeOldKey]) {
-            [self setAttributeButton:_restorePlaybackRateButton title:[NSString stringWithFormat:@"%.1fx", _playerController.rate] color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:23]];
+            [self setAttributeButton:_restorePlaybackRateButton title:[NSString stringWithFormat:@"%.1fx", _videoPlayerController.rate] color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:23]];
             NSLog(@"Rate!");
         }
     }
@@ -172,14 +167,14 @@ void *StateRateContext = &StateRateContext;
 }
 
 - (void)onPlayerControllerPlaybackStateDidChangeNotification {
-    if(_playerController.playbackState == PlaybackStatePlaying) {
+    if(_videoPlayerController.playbackState == PlaybackStatePlaying) {
         [self setAttributeButton:_playOrPauseButton title:@"" color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:25]];
         
         if(_showPlaybackTimer == nil) {
             _showPlaybackTimer = [NSTimer scheduledTimerWithTimeInterval:(0.1) target:self selector:@selector(onShowPlaybackTime:) userInfo:nil  repeats:YES];
             [[NSRunLoop mainRunLoop] addTimer:_showPlaybackTimer forMode:NSRunLoopCommonModes];
         }
-    } else if(_playerController.playbackState == PlaybackStatePaused) {
+    } else if(_videoPlayerController.playbackState == PlaybackStatePaused) {
         [self setAttributeButton:_playOrPauseButton title:@"" color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:25]];
         
         if([_showPlaybackTimer isValid]) {
@@ -190,176 +185,88 @@ void *StateRateContext = &StateRateContext;
 }
 
 - (void)onPlayerControllerLoadStateDidChangeNotification {
-    if(_playerController.loadState == LoadStateLoading) {
+    if(_videoPlayerController.loadState == LoadStateLoading) {
         [self setEnabledSubControllers:NO];
         
         _loadStateProgressIndicator.hidden = NO;
         [_loadStateProgressIndicator startAnimation:nil];
-    } else if(_playerController.loadState == LoadStateLoaded) {
+    } else if(_videoPlayerController.loadState == LoadStateLoaded) {
         [self setEnabledSubControllers:YES];
         
-        [self.view.window setContentSize:[_playerController originalSize]];
+        [self.view.window setContentSize:[_videoPlayerController originalSize]];
         
         [self setAttributeButton:_repeatIntervalStartButton title:[NSString changeTimeFloatToNSString:0.0f] color:[NSColor blackColor] font:[NSFont fontWithName:@"Feather" size:25]];
         [_repeatIntervalStartButton.layer backgroundColorRed:0.5f green:0.0f blue:0.0f alpha:0.5f];
-        [self setAttributeButton:_repeatIntervalEndButton title:[NSString changeTimeFloatToNSString:_playerController.durationTime] color:[NSColor blackColor] font:[NSFont fontWithName:@"Feather" size:25]];
+        [self setAttributeButton:_repeatIntervalEndButton title:[NSString changeTimeFloatToNSString:_videoPlayerController.durationTime] color:[NSColor blackColor] font:[NSFont fontWithName:@"Feather" size:25]];
         [_repeatIntervalEndButton.layer backgroundColorRed:0.5f green:0.0f blue:0.0f alpha:0.5f];
-        _endTime = _playerController.durationTime;
+        _endTime = _videoPlayerController.durationTime;
         
         [_loadStateProgressIndicator stopAnimation:nil];
         _loadStateProgressIndicator.hidden = YES;
-
-        [self setMute:_mute];
         
         _seekBarSlider.floatValue = 0.0f;
-        _seekBarSlider.maxValue = _playerController.durationTime;
+        _seekBarSlider.maxValue = _videoPlayerController.durationTime;
         _volumeBarSlider.maxValue = 1.0f;
         
-        _currentTimeViewButton.title = [NSString changeTimeFloatToNSString:_playerController.currentTime];
-        _durationTimeViewButton.title = [NSString changeTimeFloatToNSString:_playerController.durationTime];
+        _currentTimeViewButton.title = [NSString changeTimeFloatToNSString:_videoPlayerController.currentTime];
+        _durationTimeViewButton.title = [NSString changeTimeFloatToNSString:_videoPlayerController.durationTime];
         
-        [_playerController setRate:1.0f];
-        [self playOrPause];
-    } else if(_playerController.loadState == LoadStateFailed) {
+        [_videoPlayerController setRate:1.0f];
+        [_videoPlayerController playOrPause];
+    } else if(_videoPlayerController.loadState == LoadStateFailed) {
         [self setEnabledSubControllers:NO];
     }
 }
 
 - (void)onPlayerControllerPlaybackDidPlayToEndTimeNotification {
-    if(_repeat == YES) {
-        [_playerController setCurrentTime:0.0f];
-        [_playerController play];
+    [_videoPlayerController pause];
+    if(_videoPlayerController.repeat == YES) {
+        [_videoPlayerController setCurrentTime:0.0f];
+        [_videoPlayerController play];
     }
     if(_stateRepeatInterval == YES) {
-        [_playerController setCurrentTime:_startTime];
-        [_playerController play];
+        [_videoPlayerController setCurrentTime:_startTime];
+        [_videoPlayerController play];
     }
 }
 
 - (void)onShowPlaybackTime:(NSTimer*)timer {
-    _seekBarSlider.floatValue = _playerController.currentTime;
-    _currentTimeViewButton.title = [NSString changeTimeFloatToNSString:_playerController.currentTime];
-    _durationTimeViewButton.title = [NSString changeTimeFloatToNSString:_playerController.durationTime];
+    _seekBarSlider.floatValue = _videoPlayerController.currentTime;
+    _currentTimeViewButton.title = [NSString changeTimeFloatToNSString:_videoPlayerController.currentTime];
+    _durationTimeViewButton.title = [NSString changeTimeFloatToNSString:_videoPlayerController.durationTime];
 }
 
 - (void)onRepeatIntervalTime:(NSTimer*)timer {
     if(_startTime - 0.01f > _seekBarSlider.floatValue || _endTime < _seekBarSlider.floatValue) {
-        _playerController.currentTime = _startTime;
+        _videoPlayerController.currentTime = _startTime;
         _seekBarSlider.floatValue = _startTime;
     }
     NSLog(@"start:%f, current:%f, end:%f", _startTime, _seekBarSlider.floatValue, _endTime);
 }
 
 
-#pragma mark Playback Controller (getter/setter)
-
-- (void)setCurrentVolume:(float)currentVolume {
-    [_playerController setVolume:_currentVolume];
-    _currentVolume = currentVolume;
-}
-
-- (void)setMute:(BOOL)mute {
-    if(mute == NO) {
-        [_playerController setVolume:_currentVolume];
-    } else {
-        [_playerController setVolume:0.0f];
-    }
-    _mute = mute;
-}
-
-
-#pragma mark API
-
-- (void)setViewFrameScale:(float)scale {
-    [self.view willRemoveSubview:_playerController];
-    
-    _playerController.autoresizingMask = NSViewNotSizable;
-    
-    [_playerController setFrameSize:NSMakeSize(_playerController.originalSize.width * scale, _playerController.originalSize.height * scale)];
-    [_playerController setFrame:NSMakeRect((self.view.window.frame.size.width - _playerController.frame.size.width) * (1/2.),
-                                           (self.view.window.frame.size.height - _playerController.frame.size.height) * (1/2.),
-                                           _playerController.frame.size.width,
-                                           _playerController.frame.size.height)];
-    
-    _playerController.autoresizingMask = NSViewMinXMargin | NSViewMaxXMargin | NSViewMinYMargin | NSViewMaxYMargin;
-
-    NSLog(@"%f, %f", _playerController.frame.origin.x, _playerController.frame.origin.y);
-}
 
 - (void)loadMediaFile:(NSURL*)url {
-    _playerController = [[PlayerController alloc]initWithMediaFileURL:url andRect:self.view.bounds];
-    [self.view addSubview:_playerController];
-
-    [self setNotifications:_playerController];
+    _videoPlayerController = [[VideoPlayerController alloc]initWithMediaFileURL:url andRect:self.view.bounds];
+    [self.view addSubview:_videoPlayerController];
+    
+    [self setNotifications:_videoPlayerController];
 }
 
 - (void)stopMediaFile {
-    [self removeNotifications:_playerController];
-    [_playerController pause];
-    [_playerController removeFromSuperviewWithoutNeedingDisplay];
-    _playerController = nil;
+    [self removeNotifications:_videoPlayerController];
+    [_videoPlayerController pause];
+    [_videoPlayerController removeFromSuperviewWithoutNeedingDisplay];
+    _videoPlayerController = nil;
 }
 
-- (void)playOrPause {
-    if(_playerController.playbackState == PlaybackStatePlaying) {
-        [_playerController pause];
-    } else if(_playerController.playbackState == PlaybackStatePaused) {
-        [_playerController play];
-    }
-}
 
-- (void)increasePlaybackRate {
-    [_playerController setRate:_playerController.rate + 0.1f];
-    if(_playerController.rate > (_maxRate - 0.05f)) {
-        _playerController.rate = _maxRate;
-    }
-}
-
-- (void)restorePlaybackRate {
-    [_playerController setRate:1.0f];
-}
-
-- (void)decreasePlaybackRate {
-    [_playerController setRate:_playerController.rate - 0.1f];
-    if(_playerController.rate < (_minRate + 0.05f)) {
-        _playerController.rate = _minRate;
-    }
-}
-
-- (void)changeVideoGravity {
-    switch(_playerController.videoGravity) {
-        case VideoGravityResize:
-            _playerController.videoGravity = VideoGravityResizeAspectFill;
-            break;
-        case VideoGravityResizeAspect:
-            _playerController.videoGravity = VideoGravityResize;
-            break;
-        case VideoGravityResizeAspectFill:
-            _playerController.videoGravity = VideoGravityResizeAspect;
-            break;
-    }
-}
-
-- (void)changeVideoResize {
-    static int scale;
-    scale ++;
-    scale = scale % 4;
-    [self setViewFrameScale:(float)scale + 1.0f];
-}
-
-- (void)stepBackward {
-    [_playerController setCurrentTime:_playerController.currentTime - 5.0f];
-}
-
-- (void)stepForward {
-    [_playerController setCurrentTime:_playerController.currentTime + 5.0f];
-}
 
 
 #pragma mark Playback Controller Button
 
 - (IBAction)playOrPauseAction:(id)sender {
-    [self playOrPause];
+    [_videoPlayerController playOrPause];
 }
 
 - (IBAction)stopAction:(id)sender {
@@ -368,35 +275,35 @@ void *StateRateContext = &StateRateContext;
 }
 
 - (IBAction)increasePlaybackRateAction:(id)sender {
-    [self increasePlaybackRate];
+    [_videoPlayerController increasePlaybackRate];
 }
 
 - (IBAction)restorePlaybackRateAction:(id)sender {
-    [self restorePlaybackRate];
+    [_videoPlayerController restorePlaybackRate];
     
 }
 
 - (IBAction)decreasePlaybackRateAction:(id)sender {
-    [self decreasePlaybackRate];
+    [_videoPlayerController decreasePlaybackRate];
 }
 
 - (IBAction)stepForwardAction:(id)sender {
-    [self stepForward];
+    [_videoPlayerController stepForward];
 }
 
 - (IBAction)stepBackwardAction:(id)sender {
-    [self stepBackward];
+    [_videoPlayerController stepBackward];
 }
 
 - (IBAction)seekBarAction:(id)sender {
-    _playerController.currentTime = _seekBarSlider.floatValue;
-    _currentTimeViewButton.title = [NSString changeTimeFloatToNSString:_playerController.currentTime];
+    _videoPlayerController.currentTime = _seekBarSlider.floatValue;
+    _currentTimeViewButton.title = [NSString changeTimeFloatToNSString:_videoPlayerController.currentTime];
 }
 
 - (IBAction)volumeBarAction:(id)sender {
-    [self setCurrentVolume:_volumeBarSlider.floatValue];
+    [_videoPlayerController setCurrentVolume:_volumeBarSlider.floatValue];
     
-    if(_currentVolume == 0.0f) {
+    if(_videoPlayerController.currentVolume == 0.0f) {
         [self setAttributeButton:_toggleMuteModeButton title:@"" color:[NSColor blueColor] font:[NSFont fontWithName:@"Pe-icon-7-stroke" size:30]];
     } else {
         [self setAttributeButton:_toggleMuteModeButton title:@"" color:[NSColor blueColor] font:[NSFont fontWithName:@"Pe-icon-7-stroke" size:30]];
@@ -404,40 +311,40 @@ void *StateRateContext = &StateRateContext;
 }
 
 - (IBAction)toggleRepeatModeAction:(id)sender {
-    if(_repeat == NO) {
+    if(_videoPlayerController.repeat == NO) {
         [self setAttributeButton:_toggleRepeatModeButton  title:@"" color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:25]];
     } else {
         [self setAttributeButton:_toggleRepeatModeButton  title:@"" color:[NSColor redColor]  font:[NSFont fontWithName:@"Feather" size:25]];
     }
-    [self setRepeat:!_repeat];
+    [_videoPlayerController setRepeat:!_videoPlayerController.repeat];
 }
 
 - (IBAction)toggleShuffleModeAction:(id)sender {
-    if(_shuffle == NO) {
+    if(_videoPlayerController.shuffle == NO) {
         [self setAttributeButton:_toggleShuffleModeButton title:@"" color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:25]];
     } else {
         [self setAttributeButton:_toggleShuffleModeButton title:@"" color:[NSColor redColor]  font:[NSFont fontWithName:@"Feather" size:25]];
     }
-    [self setShuffle:!_shuffle];
+    [_videoPlayerController setShuffle:!_videoPlayerController.shuffle];
 }
 
 - (IBAction)toggleMuteModeAction:(id)sender {
-    if(_mute == NO) {
+    if(_videoPlayerController.mute == NO) {
         [self setAttributeButton:_toggleMuteModeButton title:@"" color:[NSColor blueColor] font:[NSFont fontWithName:@"Pe-icon-7-stroke" size:30]];
         _volumeBarSlider.floatValue = 0.0f;
     } else {
         [self setAttributeButton:_toggleMuteModeButton title:@"" color:[NSColor blueColor] font:[NSFont fontWithName:@"Pe-icon-7-stroke" size:30]];
-        _volumeBarSlider.floatValue = _currentVolume;
+        _volumeBarSlider.floatValue = _videoPlayerController.currentVolume;
     }
-    [self setMute:!_mute];
+    [_videoPlayerController setMute:!_videoPlayerController.mute];
 }
 
 - (IBAction)changeVideoGravityAction:(id)sender {
-    [self changeVideoGravity];
+    [_videoPlayerController changeVideoGravity];
 }
 
 - (IBAction)changeVideoResizeButton:(id)sender {
-    [self changeVideoResize];
+    [_videoPlayerController changeVideoResize];
 }
 
 - (IBAction)repeatIntervalViewAction:(id)sender {
@@ -463,11 +370,11 @@ void *StateRateContext = &StateRateContext;
 }
 
 - (IBAction)repeatIntervalEndAction:(id)sender {
-    if(_endTime != _playerController.durationTime) {
+    if(_endTime != _videoPlayerController.durationTime) {
         [_repeatIntervalEndButton.layer backgroundColorRed:0.5f green:0.0f blue:0.0f alpha:0.5f];
-        [self setEndTime:_playerController.durationTime];
+        [self setEndTime:_videoPlayerController.durationTime];
     } else {
-        if(_seekBarSlider.floatValue == _playerController.durationTime) {
+        if(_seekBarSlider.floatValue == _videoPlayerController.durationTime) {
             return;
         }
         [_repeatIntervalEndButton.layer backgroundColorRed:0.0f green:0.0f blue:0.5f alpha:0.5f];
@@ -478,7 +385,7 @@ void *StateRateContext = &StateRateContext;
 
 - (void)setStartTime:(float)startTime {
     _startTime = startTime;
-    if(_startTime != 0.0f || _endTime != _playerController.durationTime) {
+    if(_startTime != 0.0f || _endTime != _videoPlayerController.durationTime) {
         [self setStateRepeatInterval:YES];
     } else {
         [self setStateRepeatInterval:NO];
@@ -486,7 +393,7 @@ void *StateRateContext = &StateRateContext;
 }
 - (void)setEndTime:(float)endTime {
     _endTime = endTime;
-    if(_startTime != 0.0f || _endTime != _playerController.durationTime) {
+    if(_startTime != 0.0f || _endTime != _videoPlayerController.durationTime) {
         [self setStateRepeatInterval:YES];
     } else {
         [self setStateRepeatInterval:NO];

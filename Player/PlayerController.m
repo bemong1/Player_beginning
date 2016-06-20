@@ -31,7 +31,6 @@ NSString *const PlayerControllerPlaybackStateDidChangeNotification = @"PlayerCon
 NSString *const PlayerControllerLoadStateDidChangeNotification = @"PlayerControllerLoadStateDidChangeNotification";
 NSString *const PlayerControllerPlaybackDidPlayToEndTimeNotification = @"PlayerControllerPlaybackDidPlayToEndTimeNotification";
 
-
 #pragma mark Init
 
 - (id)initWithMediaFileURL:(NSURL*)fileURL andRect:(NSRect)frameRect {
