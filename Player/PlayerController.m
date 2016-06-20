@@ -47,8 +47,7 @@ NSString *const PlayerControllerPlaybackDidPlayToEndTimeNotification = @"PlayerC
 }
 
 - (void)dealloc {    
-    [_player.currentItem removeObserver:self forKeyPath:@"status"];
-    [_player removeObserver:self forKeyPath:@"rate"];
+    [_player.currentItem removeObserver:self forKeyPath:@"status"];    
     [[NSNotificationCenter defaultCenter] removeObserver:self];    
 }
 
@@ -67,14 +66,14 @@ NSString *const PlayerControllerPlaybackDidPlayToEndTimeNotification = @"PlayerC
     AVURLAsset *asset= [AVURLAsset URLAssetWithURL:fileURL options:nil];
     NSString *tracksKey = @"tracks";
     
-    _originalSize = [[asset tracksWithMediaType:AVMediaTypeVideo][0] naturalSize];;
-    
     [asset loadValuesAsynchronouslyForKeys:@[tracksKey] completionHandler:^() {
         dispatch_async(dispatch_get_main_queue(), ^ {
             NSError *error;
             AVKeyValueStatus status = [asset statusOfValueForKey:@"tracks" error:&error];
             
             if(status == AVKeyValueStatusLoaded) {
+                [self setLoadState:LoadStateLoading];
+                
                 AVPlayerItem* playerItem = [AVPlayerItem playerItemWithAsset:asset];
                 _player = [AVPlayer playerWithPlayerItem:playerItem];
                 
@@ -85,10 +84,11 @@ NSString *const PlayerControllerPlaybackDidPlayToEndTimeNotification = @"PlayerC
                 [self.layer addSublayer:_playerLayer];
                 self.layer.zPosition = -1;
                 
-                [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemDidReachEnd) name:AVPlayerItemDidPlayToEndTimeNotification object:_player.currentItem];
-                [_player.currentItem addObserver:self forKeyPath:@"status" options:0 context:ItemStatusContext];                
+                 _originalSize = [[asset tracksWithMediaType:AVMediaTypeVideo][0] naturalSize];
                 
-                [self setLoadState:LoadStateLoading];
+                [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemDidReachEnd) name:AVPlayerItemDidPlayToEndTimeNotification object:_player.currentItem];
+                [_player.currentItem addObserver:self forKeyPath:@"status" options:0 context:ItemStatusContext];
+                
             } else {
                 [self setLoadState:LoadStateFailed];
                 NSLog(@"Fail");
@@ -150,8 +150,7 @@ NSString *const PlayerControllerPlaybackDidPlayToEndTimeNotification = @"PlayerC
     if(_playbackState == PlaybackStatePlaying) {
         _player.rate = _rate = rate;
     } else {
-        _rate = rate;
-        
+        _rate = rate;        
     }
 }
 

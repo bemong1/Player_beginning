@@ -10,7 +10,7 @@
 
 #import "PlayerController.h"
 
-@interface PlayerViewController : NSViewController
+@interface MoviePlayerViewController : NSViewController
 
 @property (nonatomic) PlayerController *playerController;
 

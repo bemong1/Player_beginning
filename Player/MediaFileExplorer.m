@@ -8,11 +8,11 @@
 
 #import "MediaFileExplorer.h"
 
-#import "PlayerViewController.h"
+#import "MoviePlayerViewController.h"
 
 @interface MediaFileExplorer ()
 
-@property (nonatomic) PlayerViewController *playerViewController;
+@property (nonatomic) MoviePlayerViewController *moviePlayerViewController;
 
 @property (nonatomic) IBOutlet NSTableView *tableView;
 
@@ -129,15 +129,15 @@
 
 - (void)createPlayerViewController:(NSString*)fileName {
     NSStoryboard *storyboard = [NSStoryboard storyboardWithName:@"Main" bundle:nil];
-    _playerViewController = [storyboard instantiateControllerWithIdentifier:@"playerViewController"];
-    [_playerViewController presentViewControllerAsModalWindow:_playerViewController];
+    _moviePlayerViewController = [storyboard instantiateControllerWithIdentifier:@"playerViewController"];
+    [_moviePlayerViewController presentViewControllerAsModalWindow:_moviePlayerViewController];
     
     NSString* aFilePathUsingURL = [NSString stringWithFormat:@"file://"];
     aFilePathUsingURL = [aFilePathUsingURL stringByAppendingString:[self setURLOfFile:fileName]];
     aFilePathUsingURL = [aFilePathUsingURL stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
     
     NSURL* fileURL = [NSURL URLWithString:aFilePathUsingURL];
-    [_playerViewController loadMediaFile:fileURL];
+    [_moviePlayerViewController loadMediaFile:fileURL];
 }
 
 

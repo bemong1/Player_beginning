@@ -6,14 +6,14 @@
 //  Copyright © 2016년 kwk.self. All rights reserved.
 //
 
-#import "PlayerViewController.h"
+#import "MoviePlayerViewController.h"
 #import "URLList.h"
 
 #import "CALayer+AddMethod.h"
 #import "NSString+AddMethod.h"
 
 
-@interface PlayerViewController ()
+@interface MoviePlayerViewController ()
 
 @property (strong) IBOutlet NSView *topView;
 @property (strong) IBOutlet NSView *bottomView;
@@ -82,7 +82,7 @@
 
 @end
 
-@implementation PlayerViewController
+@implementation MoviePlayerViewController
 
 void *StateRepeatIntervalContext = &StateRepeatIntervalContext;
 void *StateRateContext = &StateRateContext;
@@ -140,7 +140,10 @@ void *StateRateContext = &StateRateContext;
 }
 
 - (void)removeNotifications:(id)playerController {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];;
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    
+    [self removeObserver:self forKeyPath:@"stateRepeatInterval"];
+    [_playerController removeObserver:self forKeyPath:@"rate"];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context {
@@ -151,7 +154,6 @@ void *StateRateContext = &StateRateContext;
                 _repeatIntervalTimer = [NSTimer scheduledTimerWithTimeInterval:(0.1) target:self selector:@selector(onRepeatIntervalTime:) userInfo:nil  repeats:YES];
                 [[NSRunLoop mainRunLoop] addTimer:_repeatIntervalTimer forMode:NSRunLoopCommonModes];
             }
-            
         } else {
             [self setAttributeButton:_repeatIntervalButton title:[NSString stringWithFormat:@"A⇄B"] color:[NSColor redColor] font:[NSFont fontWithName:@"Feather" size:21]];
             if([_repeatIntervalTimer isValid]) {
@@ -162,6 +164,7 @@ void *StateRateContext = &StateRateContext;
         NSLog(@"change");
     } else if(context == StateRateContext) {
         if(change[NSKeyValueChangeNewKey] != change[NSKeyValueChangeOldKey]) {
+            [self setAttributeButton:_restorePlaybackRateButton title:[NSString stringWithFormat:@"%.1fx", _playerController.rate] color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:23]];
             NSLog(@"Rate!");
         }
     }
@@ -194,6 +197,8 @@ void *StateRateContext = &StateRateContext;
         [_loadStateProgressIndicator startAnimation:nil];
     } else if(_playerController.loadState == LoadStateLoaded) {
         [self setEnabledSubControllers:YES];
+        
+        [self.view.window setContentSize:[_playerController originalSize]];
         
         [self setAttributeButton:_repeatIntervalStartButton title:[NSString changeTimeFloatToNSString:0.0f] color:[NSColor blackColor] font:[NSFont fontWithName:@"Feather" size:25]];
         [_repeatIntervalStartButton.layer backgroundColorRed:0.5f green:0.0f blue:0.0f alpha:0.5f];
@@ -238,11 +243,7 @@ void *StateRateContext = &StateRateContext;
 }
 
 - (void)onRepeatIntervalTime:(NSTimer*)timer {
-    if(_startTime - 0.01f > _seekBarSlider.floatValue) {
-        _playerController.currentTime = _startTime;
-        _seekBarSlider.floatValue = _startTime;
-    }
-    if(_endTime < _seekBarSlider.floatValue) {
+    if(_startTime - 0.01f > _seekBarSlider.floatValue || _endTime < _seekBarSlider.floatValue) {
         _playerController.currentTime = _startTime;
         _seekBarSlider.floatValue = _startTime;
     }
@@ -288,11 +289,8 @@ void *StateRateContext = &StateRateContext;
 - (void)loadMediaFile:(NSURL*)url {
     _playerController = [[PlayerController alloc]initWithMediaFileURL:url andRect:self.view.bounds];
     [self.view addSubview:_playerController];
-    [self.view.window setContentSize:[_playerController originalSize]];
 
     [self setNotifications:_playerController];
-    
-    
 }
 
 - (void)stopMediaFile {
@@ -371,17 +369,15 @@ void *StateRateContext = &StateRateContext;
 
 - (IBAction)increasePlaybackRateAction:(id)sender {
     [self increasePlaybackRate];
-    [self setAttributeButton:_restorePlaybackRateButton title:[NSString stringWithFormat:@"%.1fx", _playerController.rate] color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:23]];
 }
 
 - (IBAction)restorePlaybackRateAction:(id)sender {
     [self restorePlaybackRate];
-    [self setAttributeButton:_restorePlaybackRateButton title:[NSString stringWithFormat:@"%.1fx", _playerController.rate] color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:23]];
+    
 }
 
 - (IBAction)decreasePlaybackRateAction:(id)sender {
     [self decreasePlaybackRate];
-    [self setAttributeButton:_restorePlaybackRateButton title:[NSString stringWithFormat:@"%.1fx", _playerController.rate] color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:23]];
 }
 
 - (IBAction)stepForwardAction:(id)sender {
