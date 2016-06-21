@@ -55,4 +55,11 @@
     }
 }
 
+- (void)executeRepeatInterval:(float)currentTime {
+    if(_startTime - 0.01f > currentTime || _endTime < currentTime) {
+        currentTime = _startTime;
+    }
+    NSLog(@"start:%f, current:%f, end:%f", _startTime, currentTime, _endTime);
+}
+
 @end

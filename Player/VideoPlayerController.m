@@ -7,13 +7,10 @@
 //
 
 #import "VideoPlayerController.h"
-#import "RepeatIntervalController.h"
 
 #import "CALayer+AddMethod.h"
 
 @interface VideoPlayerController ()
-
-@property (nonatomic) RepeatIntervalController *repeatIntervalController;
 @property (strong) NSTimer *repeatIntervalTimer;
 
 @end
@@ -101,12 +98,12 @@
 
 - (void)setStartTime:(float)startTime {
     if(_isStartTime == NO) {
-        if(startTime != 0.0f) {
+        if(self.currentTime != 0.0f) {
             _isStartTime = YES;
         } else {
             _isStartTime = NO;
         }
-        _startTime = startTime;
+        _startTime = self.currentTime;
     } else {
         _startTime = 0.0f;
         _isStartTime = NO;
@@ -115,16 +112,17 @@
 
 - (void)setEndTime:(float)endTime {
     if(_isEndTime == NO) {
-        if(endTime != self.durationTime) {
+        if(self.currentTime != self.durationTime) {
             _isEndTime = YES;
         } else {
             _isEndTime = NO;
         }
-        _endTime = endTime;
+        _endTime = self.currentTime;
     } else {
         _endTime = self.durationTime;
         _isEndTime = NO;
-    }    
+    }   
+    
 }
 
 - (BOOL)stateRepeatInterval {
@@ -146,10 +144,10 @@
 }
 
 - (void)onRepeatIntervalTime:(NSTimer*)timer {
-    if(_startTime - 0.01f > self.currentTime || _endTime < self.currentTime) {
-        self.currentTime = _startTime;
+    if(self.startTime - 0.01f > self.currentTime || self.endTime < self.currentTime) {
+        self.currentTime = self.startTime;
     }
-    NSLog(@"start:%f, current:%f, end:%f", _startTime, self.currentTime, _endTime);
+    NSLog(@"start:%f, current:%f, end:%f", self.startTime, self.currentTime, self.endTime);
 }
 
 - (void)changeVideoResize {
