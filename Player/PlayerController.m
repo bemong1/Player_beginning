@@ -54,11 +54,15 @@ NSString *const PlayerControllerPlaybackDidPlayToEndTimeNotification = @"PlayerC
     if(context == ItemStatusContext) {
         if(_player.currentItem.status == AVPlayerStatusReadyToPlay) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self setLoadState:LoadStateLoaded];
+                [self playerDidReadyToPlay];
             });
         }
         return;
     }
+}
+
+- (void)playerDidReadyToPlay {
+    [self setLoadState:LoadStateLoaded];
 }
 
 - (void)open:(NSURL*)fileURL {

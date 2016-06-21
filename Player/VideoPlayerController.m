@@ -12,6 +12,7 @@
 
 @interface VideoPlayerController ()
 @property (strong) NSTimer *repeatIntervalTimer;
+
 @end
 
 
@@ -25,6 +26,13 @@
         _maxRate = 2.0f;        
     }
     return self;
+}
+
+- (void)playerDidReadyToPlay {
+    [super playerDidReadyToPlay];
+    
+    _endTime = self.durationTime;
+    [self setRate:1.0f];
 }
 
 
@@ -89,36 +97,39 @@
 }
 
 - (void)setStartTime:(float)startTime {
+    [self setStateRepeatInterval:YES];
     _startTime = startTime;
-    if(_startTime != 0.0f || _endTime != self.durationTime) {
-        [self setStateRepeatInterval:YES];
-    } else {
-        [self setStateRepeatInterval:NO];
-    }
+    
 }
 
 - (void)setEndTime:(float)endTime {
+    [self setStateRepeatInterval:YES];
     _endTime = endTime;
-    if(_startTime != 0.0f || _endTime != self.durationTime) {
-        [self setStateRepeatInterval:YES];
-    } else {
-        [self setStateRepeatInterval:NO];
-    }
+    
 }
 
 - (void)setStateRepeatInterval:(BOOL)stateRepeatInterval {
-    if(stateRepeatInterval == YES) {
-        if(_repeatIntervalTimer == nil) {
-            _repeatIntervalTimer = [NSTimer scheduledTimerWithTimeInterval:(0.1) target:self selector:@selector(onRepeatIntervalTime:) userInfo:nil  repeats:YES];
-            [[NSRunLoop mainRunLoop] addTimer:_repeatIntervalTimer forMode:NSRunLoopCommonModes];
-        }
+    if(_startTime != 0.0f || _endTime != self.durationTime) {
+        [self repeatIntervalTimerStart];
     } else {
-        if([_repeatIntervalTimer isValid]) {
-            [_repeatIntervalTimer invalidate];
-            _repeatIntervalTimer = nil;
-        }
+        [self repeatIntervalTimerEnd];
     }
-    _stateRepeatInterval = stateRepeatInterval;
+}
+
+- (void)repeatIntervalTimerStart {
+    if(_repeatIntervalTimer == nil) {
+        _repeatIntervalTimer = [NSTimer scheduledTimerWithTimeInterval:(0.1) target:self selector:@selector(onRepeatIntervalTime:) userInfo:nil  repeats:YES];
+        [[NSRunLoop mainRunLoop] addTimer:_repeatIntervalTimer forMode:NSRunLoopCommonModes];
+        _stateRepeatInterval = YES;
+    }
+}
+
+- (void)repeatIntervalTimerEnd {
+    if([_repeatIntervalTimer isValid]) {
+        [_repeatIntervalTimer invalidate];
+        _repeatIntervalTimer = nil;
+        _stateRepeatInterval = NO;
+    }
 }
 
 - (void)onRepeatIntervalTime:(NSTimer*)timer {

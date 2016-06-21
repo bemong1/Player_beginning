@@ -155,7 +155,6 @@ void *StateRateContext = &StateRateContext;
             NSLog(@"Rate!");
         }
     }
-    
 }
 
 - (void)onPlayerControllerPlaybackStateDidChangeNotification {
@@ -191,7 +190,7 @@ void *StateRateContext = &StateRateContext;
         [_repeatIntervalStartButton.layer backgroundColorRed:0.5f green:0.0f blue:0.0f alpha:0.5f];
         [self setAttributeButton:_repeatIntervalEndButton title:[NSString changeTimeFloatToNSString:_videoPlayerController.durationTime] color:[NSColor blackColor] font:[NSFont fontWithName:@"Feather" size:25]];
         [_repeatIntervalEndButton.layer backgroundColorRed:0.5f green:0.0f blue:0.0f alpha:0.5f];
-        _videoPlayerController.endTime = _videoPlayerController.durationTime;
+        
         
         [_loadStateProgressIndicator stopAnimation:nil];
         _loadStateProgressIndicator.hidden = YES;
@@ -202,11 +201,16 @@ void *StateRateContext = &StateRateContext;
         
         _currentTimeViewButton.title = [NSString changeTimeFloatToNSString:_videoPlayerController.currentTime];
         _durationTimeViewButton.title = [NSString changeTimeFloatToNSString:_videoPlayerController.durationTime];
-        
-        [_videoPlayerController setRate:1.0f];
-        [_videoPlayerController playOrPause];
+
     } else if(_videoPlayerController.loadState == LoadStateFailed) {
         [self setEnabledSubControllers:NO];
+        
+        NSAlert *alert = [[NSAlert alloc]init];
+        [alert addButtonWithTitle:@"OK"];
+        [alert setMessageText:@"Error"];
+        [alert setInformativeText:@"Cannot Open"];
+        [alert setAlertStyle:NSWarningAlertStyle];
+        [alert runModal];
     }
 }
 
@@ -227,7 +231,6 @@ void *StateRateContext = &StateRateContext;
     _currentTimeViewButton.title = [NSString changeTimeFloatToNSString:_videoPlayerController.currentTime];
     _durationTimeViewButton.title = [NSString changeTimeFloatToNSString:_videoPlayerController.durationTime];
 }
-
 
 - (void)loadMediaFile:(NSURL*)url {
     _videoPlayerController = [[VideoPlayerController alloc]initWithMediaFileURL:url andRect:self.view.bounds];
@@ -337,28 +340,29 @@ void *StateRateContext = &StateRateContext;
 
 - (IBAction)repeatIntervalStartAction:(id)sender {
     if(_videoPlayerController.startTime != 0.0f) {
-        [_repeatIntervalStartButton.layer backgroundColorRed:0.5f green:0.0f blue:0.0f alpha:0.5f];
         [_videoPlayerController setStartTime:0.0f];
+        [_repeatIntervalStartButton.layer backgroundColorRed:0.5f green:0.0f blue:0.0f alpha:0.5f];
     } else {
         if(_videoPlayerController.currentTime == 0.0f) {
             return;
         }
-        [_repeatIntervalStartButton.layer backgroundColorRed:0.0f green:0.0f blue:0.5f alpha:0.5f];
         [_videoPlayerController setStartTime:_seekBarSlider.floatValue];
+        [_repeatIntervalStartButton.layer backgroundColorRed:0.0f green:0.0f blue:0.5f alpha:0.5f];
+        
     }
     [self setAttributeButton:_repeatIntervalStartButton title:[NSString changeTimeFloatToNSString:_videoPlayerController.startTime] color:[NSColor blackColor] font:[NSFont fontWithName:@"Feather" size:25]];
 }
 
 - (IBAction)repeatIntervalEndAction:(id)sender {
     if(_videoPlayerController.endTime != _videoPlayerController.durationTime) {
-        [_repeatIntervalEndButton.layer backgroundColorRed:0.5f green:0.0f blue:0.0f alpha:0.5f];
         [_videoPlayerController setEndTime:_videoPlayerController.durationTime];
+        [_repeatIntervalEndButton.layer backgroundColorRed:0.5f green:0.0f blue:0.0f alpha:0.5f];
     } else {
         if(_videoPlayerController.currentTime == _videoPlayerController.durationTime) {
             return;
         }
-        [_repeatIntervalEndButton.layer backgroundColorRed:0.0f green:0.0f blue:0.5f alpha:0.5f];
         [_videoPlayerController setEndTime:_seekBarSlider.floatValue];
+        [_repeatIntervalEndButton.layer backgroundColorRed:0.0f green:0.0f blue:0.5f alpha:0.5f];
     }
     [self setAttributeButton:_repeatIntervalEndButton title:[NSString changeTimeFloatToNSString:_videoPlayerController.endTime] color:[NSColor blackColor] font:[NSFont fontWithName:@"Feather" size:25]];
 }

@@ -21,6 +21,8 @@ extern NSString *const PlayerControllerPlaybackDidPlayToEndTimeNotification;
 #pragma mark Init
 
 - (id)initWithMediaFileURL:(NSURL*)fileURL andRect:(NSRect)frameRect;
+- (void)playerDidReadyToPlay;
+
 
 #pragma mark Playback Controller
 
