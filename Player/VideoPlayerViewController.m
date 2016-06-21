@@ -7,13 +7,15 @@
 //
 
 #import "VideoPlayerViewController.h"
-#import "URLList.h"
+#import "RepeatIntervalController.h"
 
 #import "CALayer+AddMethod.h"
 #import "NSString+AddMethod.h"
 
 
 @interface VideoPlayerViewController ()
+
+@property (nonatomic) RepeatIntervalController *repeatIntervalController;
 
 @property (strong) IBOutlet NSView *topView;
 @property (strong) IBOutlet NSView *bottomView;
@@ -126,23 +128,11 @@ void *StateRateContext = &StateRateContext;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPlayerControllerPlaybackStateDidChangeNotification) name:PlayerControllerPlaybackStateDidChangeNotification object:videoPlayerController];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPlayerControllerLoadStateDidChangeNotification) name:PlayerControllerLoadStateDidChangeNotification object:videoPlayerController];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPlayerControllerPlaybackDidPlayToEndTimeNotification) name:PlayerControllerPlaybackDidPlayToEndTimeNotification object:videoPlayerController];
-    
-    [videoPlayerController addObserver:self forKeyPath:@"rate" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:StateRateContext];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPlayerControllerRateDidPlayToEndTimeNotification) name:PlayerControllerRateDidChangeNotification object:videoPlayerController];
 }
 
 - (void)removeNotifications:(id)videoPlayerController {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    
-    [videoPlayerController removeObserver:self forKeyPath:@"rate"];
-}
-
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context {
-    if(context == StateRateContext) {
-        if(change[NSKeyValueChangeNewKey] != change[NSKeyValueChangeOldKey]) {
-            [self setAttributeButton:_restorePlaybackRateButton title:[NSString stringWithFormat:@"%.1fx", _videoPlayerController.rate] color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:23]];
-            NSLog(@"Rate!");
-        }
-    }
 }
 
 - (void)onPlayerControllerPlaybackStateDidChangeNotification {
@@ -150,7 +140,7 @@ void *StateRateContext = &StateRateContext;
         [self setAttributeButton:_playOrPauseButton title:@"" color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:25]];
         
         if(_showPlaybackTimer == nil) {
-            _showPlaybackTimer = [NSTimer scheduledTimerWithTimeInterval:(0.1) target:self selector:@selector(onShowPlaybackTime:) userInfo:nil  repeats:YES];
+            _showPlaybackTimer = [NSTimer scheduledTimerWithTimeInterval:(0.5) target:self selector:@selector(onShowPlaybackTime:) userInfo:nil  repeats:YES];
             [[NSRunLoop mainRunLoop] addTimer:_showPlaybackTimer forMode:NSRunLoopCommonModes];
         }
     } else if(_videoPlayerController.playbackState == PlaybackStatePaused) {
@@ -191,6 +181,8 @@ void *StateRateContext = &StateRateContext;
         
         _currentTimeViewButton.title = [NSString changeTimeFloatToNSString:_videoPlayerController.currentTime];
         _durationTimeViewButton.title = [NSString changeTimeFloatToNSString:_videoPlayerController.durationTime];
+        
+        _repeatIntervalController = [[RepeatIntervalController alloc]initWithDurationTime:_videoPlayerController.durationTime];
 
     } else if(_videoPlayerController.loadState == LoadStateFailed) {
         [self setEnabledSubControllers:NO];
@@ -210,16 +202,25 @@ void *StateRateContext = &StateRateContext;
         [_videoPlayerController setCurrentTime:0.0f];
         [_videoPlayerController play];
     }
-    if(_videoPlayerController.stateRepeatInterval == YES) {
-        [_videoPlayerController setCurrentTime:_videoPlayerController.startTime];
+    if(_repeatIntervalController.stateRepeatInterval == YES) {
+        [_videoPlayerController setCurrentTime:_repeatIntervalController.startTime];
         [_videoPlayerController play];
     }
+}
+
+- (void)onPlayerControllerRateDidPlayToEndTimeNotification {
+    [self setAttributeButton:_restorePlaybackRateButton title:[NSString stringWithFormat:@"%.1fx", _videoPlayerController.rate] color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:23]];
+    NSLog(@"Rate!");
 }
 
 - (void)onShowPlaybackTime:(NSTimer*)timer {
     _seekBarSlider.floatValue = _videoPlayerController.currentTime;
     _currentTimeViewButton.title = [NSString changeTimeFloatToNSString:_videoPlayerController.currentTime];
     _durationTimeViewButton.title = [NSString changeTimeFloatToNSString:_videoPlayerController.durationTime];
+    
+    if(_repeatIntervalController.stateRepeatInterval == YES) {
+        _videoPlayerController.currentTime = [_repeatIntervalController executeRepeatInterval:_videoPlayerController.currentTime];
+    }
 }
 
 - (void)loadMediaFile:(NSURL*)url {
@@ -236,7 +237,6 @@ void *StateRateContext = &StateRateContext;
     
     [_videoPlayerController removeFromSuperviewWithoutNeedingDisplay];
     _videoPlayerController = nil;
-    
 }
 
 
@@ -335,16 +335,16 @@ void *StateRateContext = &StateRateContext;
 }
 
 - (IBAction)repeatIntervalStartAction:(id)sender {
-    [_videoPlayerController setStartTime:_videoPlayerController.currentTime];
-    [self setAttributeButton:_repeatIntervalStartButton title:[NSString changeTimeFloatToNSString:_videoPlayerController.startTime] color:[NSColor blackColor] font:[NSFont fontWithName:@"Feather" size:25]];
+    [_repeatIntervalController setStartTime:_videoPlayerController.currentTime];
+    [self setAttributeButton:_repeatIntervalStartButton title:[NSString changeTimeFloatToNSString:_repeatIntervalController.startTime] color:[NSColor blackColor] font:[NSFont fontWithName:@"Feather" size:25]];
     
-    if(_videoPlayerController.isStartTime == YES) {
+    if(_repeatIntervalController.isStartTime == YES) {
         [_repeatIntervalStartButton.layer backgroundColorRed:0.0f green:0.0f blue:0.5f alpha:0.5f];
     } else {
         [_repeatIntervalStartButton.layer backgroundColorRed:0.5f green:0.0f blue:0.0f alpha:0.5f];
     }
     
-    if(_videoPlayerController.stateRepeatInterval == YES) {
+    if(_repeatIntervalController.stateRepeatInterval == YES) {
         [self setAttributeButton:_repeatIntervalButton title:[NSString stringWithFormat:@"A⇄B"] color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:21]];
     } else {
         [self setAttributeButton:_repeatIntervalButton title:[NSString stringWithFormat:@"A⇄B"] color:[NSColor redColor] font:[NSFont fontWithName:@"Feather" size:21]];
@@ -352,16 +352,16 @@ void *StateRateContext = &StateRateContext;
 }
 
 - (IBAction)repeatIntervalEndAction:(id)sender {
-    [_videoPlayerController setEndTime:_videoPlayerController.currentTime];
-    [self setAttributeButton:_repeatIntervalEndButton title:[NSString changeTimeFloatToNSString:_videoPlayerController.endTime] color:[NSColor blackColor] font:[NSFont fontWithName:@"Feather" size:25]];
+    [_repeatIntervalController setEndTime:_videoPlayerController.currentTime];
+    [self setAttributeButton:_repeatIntervalEndButton title:[NSString changeTimeFloatToNSString:_repeatIntervalController.endTime] color:[NSColor blackColor] font:[NSFont fontWithName:@"Feather" size:25]];
     
-    if(_videoPlayerController.isEndTime == YES) {
+    if(_repeatIntervalController.isEndTime == YES) {
         [_repeatIntervalEndButton.layer backgroundColorRed:0.0f green:0.0f blue:0.5f alpha:0.5f];
     } else {
         [_repeatIntervalEndButton.layer backgroundColorRed:0.5f green:0.0f blue:0.0f alpha:0.5f];
     }
     
-    if(_videoPlayerController.stateRepeatInterval == YES) {
+    if(_repeatIntervalController.stateRepeatInterval == YES) {
         [self setAttributeButton:_repeatIntervalButton title:[NSString stringWithFormat:@"A⇄B"] color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:21]];
     } else {
         [self setAttributeButton:_repeatIntervalButton title:[NSString stringWithFormat:@"A⇄B"] color:[NSColor redColor] font:[NSFont fontWithName:@"Feather" size:21]];

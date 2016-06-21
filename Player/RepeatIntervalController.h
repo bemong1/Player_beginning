@@ -20,6 +20,6 @@
 @property (nonatomic, readonly) BOOL isEndTime;
 @property (nonatomic, readonly) BOOL stateRepeatInterval;
 
-- (void)executeRepeatInterval:(float)currentTime;
+- (float)executeRepeatInterval:(float)currentTime;
 
 @end

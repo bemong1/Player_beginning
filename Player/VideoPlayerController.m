@@ -140,7 +140,7 @@
     if(self.startTime - 0.01f > self.currentTime || self.endTime < self.currentTime) {
         self.currentTime = self.startTime;
     }
-    NSLog(@"start:%f, current:%f, end:%f", self.startTime, self.currentTime, self.endTime);
+//    NSLog(@"start:%f, current:%f, end:%f", self.startTime, self.currentTime, self.endTime);
 }
 
 - (void)changeVideoGravity {

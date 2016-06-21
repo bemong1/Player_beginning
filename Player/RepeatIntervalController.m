@@ -13,8 +13,9 @@
 
 - (id)initWithDurationTime:(float)durationTime {
     self = [super init];
-    if(!self) {
+    if(self != nil) {
         _durationTime = durationTime;
+        _endTime = _durationTime;
     }
     return self;
 }
@@ -55,11 +56,12 @@
     }
 }
 
-- (void)executeRepeatInterval:(float)currentTime {
+- (float)executeRepeatInterval:(float)currentTime {
     if(_startTime - 0.01f > currentTime || _endTime < currentTime) {
-        currentTime = _startTime;
+        return _startTime;
     }
     NSLog(@"start:%f, current:%f, end:%f", _startTime, currentTime, _endTime);
+    return currentTime;
 }
 
 @end

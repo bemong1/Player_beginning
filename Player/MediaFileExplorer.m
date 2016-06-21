@@ -130,7 +130,7 @@
 - (void)createPlayerViewController:(NSString*)fileName {
     NSStoryboard *storyboard = [NSStoryboard storyboardWithName:@"Main" bundle:nil];
     _videoPlayerViewController = [storyboard instantiateControllerWithIdentifier:@"playerViewController"];
-    [_videoPlayerViewController presentViewControllerAsModalWindow:_videoPlayerViewController];
+    [self presentViewControllerAsModalWindow:_videoPlayerViewController];
     
     NSString* aFilePathUsingURL = [NSString stringWithFormat:@"file://"];
     aFilePathUsingURL = [aFilePathUsingURL stringByAppendingString:[self setURLOfFile:fileName]];

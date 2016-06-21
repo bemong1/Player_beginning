@@ -16,6 +16,7 @@
 extern NSString *const PlayerControllerPlaybackStateDidChangeNotification;
 extern NSString *const PlayerControllerLoadStateDidChangeNotification;
 extern NSString *const PlayerControllerPlaybackDidPlayToEndTimeNotification;
+extern NSString *const PlayerControllerRateDidChangeNotification;
 
 
 #pragma mark Init
