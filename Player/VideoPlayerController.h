@@ -27,8 +27,7 @@
 @property (nonatomic, readonly) BOOL isEndTime;
 @property (nonatomic, readonly) BOOL stateRepeatInterval;
 
-- (void)repeatIntervalTimerEnd;
-
+- (void)invalidateTimer;
 
 - (void)playOrPause;
 
@@ -36,7 +35,7 @@
 - (void)restorePlaybackRate;
 - (void)decreasePlaybackRate;
 - (void)changeVideoGravity;
-- (void)changeVideoResize;
+- (void)changeVideoResize:(float)scale;
 
 
 - (void)stepBackward;

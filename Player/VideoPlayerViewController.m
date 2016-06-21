@@ -57,7 +57,6 @@
 @property (strong) IBOutlet NSProgressIndicator *loadStateProgressIndicator;
 
 - (IBAction)playOrPauseAction:(id)sender;
-- (IBAction)stopAction:(id)sender;
 
 - (IBAction)increasePlaybackRateAction:(id)sender;
 - (IBAction)restorePlaybackRateAction:(id)sender;
@@ -84,9 +83,7 @@
 
 @implementation VideoPlayerViewController
 
-void *StateRepeatIntervalContext = &StateRepeatIntervalContext;
 void *StateRateContext = &StateRateContext;
-
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -117,7 +114,7 @@ void *StateRateContext = &StateRateContext;
 }
 
 - (void)dealloc {
-    NSLog(@"dealloc");
+    NSLog(@"VideoPlayerViewController destroy!!");
 }
 
 - (void)dismissController:(id)sender {
@@ -163,6 +160,8 @@ void *StateRateContext = &StateRateContext;
             [_showPlaybackTimer invalidate];
             _showPlaybackTimer = nil;
         }
+    } else if(_videoPlayerController.playbackState == PlaybackStateFailed) {
+        NSLog(@"PlaybackFailed!");
     }
 }
 
@@ -231,10 +230,13 @@ void *StateRateContext = &StateRateContext;
 }
 
 - (void)stopMediaFile {
-    [self removeNotifications:_videoPlayerController];
     [_videoPlayerController pause];
+    [self removeNotifications:_videoPlayerController];
+    [_videoPlayerController invalidateTimer];
+    
     [_videoPlayerController removeFromSuperviewWithoutNeedingDisplay];
     _videoPlayerController = nil;
+    
 }
 
 
@@ -318,7 +320,10 @@ void *StateRateContext = &StateRateContext;
 }
 
 - (IBAction)changeVideoResizeButton:(id)sender {
-    [_videoPlayerController changeVideoResize];
+    static int scale;
+    scale ++;
+    scale = scale % 4;
+    [_videoPlayerController changeVideoResize:(float)scale + 1.0f];
 }
 
 - (IBAction)repeatIntervalViewAction:(id)sender {

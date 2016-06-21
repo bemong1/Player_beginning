@@ -35,6 +35,10 @@
     [self setRate:1.0f];
 }
 
+- (void)dealloc {
+    NSLog(@"VideoPlayerController destroy!");
+}
+
 
 #pragma mark Playback Controller (getter/setter)
 
@@ -81,21 +85,6 @@
     }
 }
 
-- (void)changeVideoGravity {
-//    self.autoresizingMask = kCALayerWidthSizable | kCALayerHeightSizable;
-    switch(self.videoGravity) {
-        case VideoGravityResize:
-            self.videoGravity = VideoGravityResizeAspectFill;
-            break;
-        case VideoGravityResizeAspect:
-            self.videoGravity = VideoGravityResize;
-            break;
-        case VideoGravityResizeAspectFill:
-            self.videoGravity = VideoGravityResizeAspect;
-            break;
-    }
-}
-
 - (void)setStartTime:(float)startTime {
     if(_isStartTime == NO) {
         if(self.currentTime != 0.0f) {
@@ -121,25 +110,29 @@
     } else {
         _endTime = self.durationTime;
         _isEndTime = NO;
-    }   
-    
+    }
 }
 
 - (BOOL)stateRepeatInterval {
     if(_isStartTime || _isEndTime) {
-        NSLog(@"repeatInterval ON!!");
-        if(_repeatIntervalTimer == nil) {
-            _repeatIntervalTimer = [NSTimer scheduledTimerWithTimeInterval:(0.1) target:self selector:@selector(onRepeatIntervalTime:) userInfo:nil  repeats:YES];
-            [[NSRunLoop mainRunLoop] addTimer:_repeatIntervalTimer forMode:NSRunLoopCommonModes];
-        }
+        [self fireTimer];
         return YES;
     } else {
-        NSLog(@"repeatInterval!! OFF");
-        if([_repeatIntervalTimer isValid]) {
-            [_repeatIntervalTimer invalidate];
-            _repeatIntervalTimer = nil;
-        }
+        [self invalidateTimer];
         return NO;
+    }
+}
+
+- (void)fireTimer {
+    if(_repeatIntervalTimer == nil) {
+        _repeatIntervalTimer = [NSTimer scheduledTimerWithTimeInterval:(0.1) target:self selector:@selector(onRepeatIntervalTime:) userInfo:nil  repeats:YES];
+        [[NSRunLoop mainRunLoop] addTimer:_repeatIntervalTimer forMode:NSRunLoopCommonModes];
+    }
+}
+- (void)invalidateTimer {
+    if([_repeatIntervalTimer isValid]) {
+        [_repeatIntervalTimer invalidate];
+        _repeatIntervalTimer = nil;
     }
 }
 
@@ -150,11 +143,34 @@
     NSLog(@"start:%f, current:%f, end:%f", self.startTime, self.currentTime, self.endTime);
 }
 
-- (void)changeVideoResize {
-    static int scale;
-    scale ++;
-    scale = scale % 4;
-    [self setViewFrameScale:(float)scale + 1.0f];
+- (void)changeVideoGravity {
+    [self setFrame:NSMakeRect(0,
+                              0,
+                              self.window.frame.size.width,
+                              self.window.frame.size.height)];
+    self.autoresizingMask = kCALayerWidthSizable | kCALayerHeightSizable;
+    
+    switch(self.videoGravity) {
+        case VideoGravityResize:
+            self.videoGravity = VideoGravityResizeAspectFill;
+            break;
+        case VideoGravityResizeAspect:
+            self.videoGravity = VideoGravityResize;
+            break;
+        case VideoGravityResizeAspectFill:
+            self.videoGravity = VideoGravityResizeAspect;
+            break;
+    }
+}
+
+- (void)changeVideoResize:(float)scale {
+    [self setFrameSize:NSMakeSize(self.originalSize.width * scale, self.originalSize.height * scale)];
+    [self setFrame:NSMakeRect((self.window.frame.size.width - self.frame.size.width) * (1/2.),
+                              (self.window.frame.size.height - self.frame.size.height) * (1/2.),
+                              self.frame.size.width,
+                              self.frame.size.height)];
+    
+    self.autoresizingMask = NSViewMinXMargin | NSViewMaxXMargin | NSViewMinYMargin | NSViewMaxYMargin;
 }
 
 - (void)stepBackward {
@@ -165,20 +181,5 @@
     [self setCurrentTime:self.currentTime + 5.0f];
 }
 
-- (void)setViewFrameScale:(float)scale {
-    [self willRemoveSubview:self];
-    
-    self.autoresizingMask = NSViewNotSizable;
-    
-    [self setFrameSize:NSMakeSize(self.originalSize.width * scale, self.originalSize.height * scale)];
-    [self setFrame:NSMakeRect((self.window.frame.size.width - self.frame.size.width) * (1/2.),
-                                                (self.window.frame.size.height - self.frame.size.height) * (1/2.),
-                                                self.frame.size.width,
-                                                self.frame.size.height)];
-    
-    self.autoresizingMask = NSViewMinXMargin | NSViewMaxXMargin | NSViewMinYMargin | NSViewMaxYMargin;
-    
-    NSLog(@"%f, %f", self.frame.origin.x, self.frame.origin.y);
-}
 
 @end

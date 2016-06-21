@@ -30,6 +30,7 @@ static void *ItemStatusContext = &ItemStatusContext;
 NSString *const PlayerControllerPlaybackStateDidChangeNotification = @"PlayerControllerPlaybackStateDidChangeNotification";
 NSString *const PlayerControllerLoadStateDidChangeNotification = @"PlayerControllerLoadStateDidChangeNotification";
 NSString *const PlayerControllerPlaybackDidPlayToEndTimeNotification = @"PlayerControllerPlaybackDidPlayToEndTimeNotification";
+NSString *const PlayerControllerFailedToPlayToEndTimeNotification = @"PlayerControllerFailedToPlayToEndTimeNotification";
 
 #pragma mark Init
 
@@ -42,12 +43,12 @@ NSString *const PlayerControllerPlaybackDidPlayToEndTimeNotification = @"PlayerC
         [self setVideoGravity:VideoGravityResizeAspect];
         [self open:fileURL];
     }
-    return self;
+    return self;    
 }
 
 - (void)dealloc {    
     [_player.currentItem removeObserver:self forKeyPath:@"status"];    
-    [[NSNotificationCenter defaultCenter] removeObserver:self];    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context {
@@ -89,7 +90,9 @@ NSString *const PlayerControllerPlaybackDidPlayToEndTimeNotification = @"PlayerC
                 
                  _originalSize = [[asset tracksWithMediaType:AVMediaTypeVideo][0] naturalSize];
                 
-                [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemDidReachEnd) name:AVPlayerItemDidPlayToEndTimeNotification object:_player.currentItem];
+                [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemDidReachEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:_player.currentItem];
+                [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onAVPlayerItemFailedToPlayToEndTimeNotification:) name:
+                 AVPlayerItemFailedToPlayToEndTimeNotification object:_player.currentItem];
                 [_player.currentItem addObserver:self forKeyPath:@"status" options:0 context:ItemStatusContext];
                 
             } else {
@@ -100,8 +103,15 @@ NSString *const PlayerControllerPlaybackDidPlayToEndTimeNotification = @"PlayerC
     }];
 }
 
-- (void)playerItemDidReachEnd {
+- (void)playerItemDidReachEnd:(NSNotification*)notification {
     [[NSNotificationCenter defaultCenter] postNotificationName:PlayerControllerPlaybackDidPlayToEndTimeNotification object:self];
+}
+
+- (void)onAVPlayerItemFailedToPlayToEndTimeNotification:(NSNotification*)notification {
+    NSError *error = notification.userInfo[AVPlayerItemFailedToPlayToEndTimeErrorKey];
+    NSLog(@"%@", error);
+    [[NSNotificationCenter defaultCenter] postNotificationName:PlayerControllerFailedToPlayToEndTimeNotification object:self];
+    [self setPlaybackState:PlaybackStateFailed];
 }
 
 

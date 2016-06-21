@@ -28,7 +28,8 @@ extern NSString *const PlayerControllerPlaybackDidPlayToEndTimeNotification;
 
 typedef NS_ENUM(NSInteger, PlaybackState) {
     PlaybackStatePaused,
-    PlaybackStatePlaying,    
+    PlaybackStatePlaying,
+    PlaybackStateFailed
 };
 
 typedef NS_ENUM(NSInteger, LoadState) {
