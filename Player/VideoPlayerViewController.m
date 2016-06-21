@@ -130,26 +130,17 @@ void *StateRateContext = &StateRateContext;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPlayerControllerLoadStateDidChangeNotification) name:PlayerControllerLoadStateDidChangeNotification object:videoPlayerController];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPlayerControllerPlaybackDidPlayToEndTimeNotification) name:PlayerControllerPlaybackDidPlayToEndTimeNotification object:videoPlayerController];
     
-    [videoPlayerController addObserver:self forKeyPath:@"stateRepeatInterval" options:0 context:StateRepeatIntervalContext];
     [videoPlayerController addObserver:self forKeyPath:@"rate" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:StateRateContext];
 }
 
 - (void)removeNotifications:(id)videoPlayerController {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
-    [videoPlayerController removeObserver:self forKeyPath:@"stateRepeatInterval"];
     [videoPlayerController removeObserver:self forKeyPath:@"rate"];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context {
-    if(context == StateRepeatIntervalContext) {
-        if(_videoPlayerController.stateRepeatInterval == YES) {
-            [self setAttributeButton:_repeatIntervalButton title:[NSString stringWithFormat:@"A⇄B"] color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:21]];
-        } else {
-            [self setAttributeButton:_repeatIntervalButton title:[NSString stringWithFormat:@"A⇄B"] color:[NSColor redColor] font:[NSFont fontWithName:@"Feather" size:21]];
-        } 
-        NSLog(@"change");
-    } else if(context == StateRateContext) {
+    if(context == StateRateContext) {
         if(change[NSKeyValueChangeNewKey] != change[NSKeyValueChangeOldKey]) {
             [self setAttributeButton:_restorePlaybackRateButton title:[NSString stringWithFormat:@"%.1fx", _videoPlayerController.rate] color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:23]];
             NSLog(@"Rate!");
@@ -339,34 +330,39 @@ void *StateRateContext = &StateRateContext;
 }
 
 - (IBAction)repeatIntervalStartAction:(id)sender {
-    if(_videoPlayerController.startTime != 0.0f) {
-        [_videoPlayerController setStartTime:0.0f];
-        [_repeatIntervalStartButton.layer backgroundColorRed:0.5f green:0.0f blue:0.0f alpha:0.5f];
-    } else {
-        if(_videoPlayerController.currentTime == 0.0f) {
-            return;
-        }
-        [_videoPlayerController setStartTime:_seekBarSlider.floatValue];
-        [_repeatIntervalStartButton.layer backgroundColorRed:0.0f green:0.0f blue:0.5f alpha:0.5f];
-        
-    }
+    [_videoPlayerController setStartTime:_videoPlayerController.currentTime];
     [self setAttributeButton:_repeatIntervalStartButton title:[NSString changeTimeFloatToNSString:_videoPlayerController.startTime] color:[NSColor blackColor] font:[NSFont fontWithName:@"Feather" size:25]];
+    
+    if(_videoPlayerController.isStartTime == YES) {
+        [_repeatIntervalStartButton.layer backgroundColorRed:0.0f green:0.0f blue:0.5f alpha:0.5f];
+    } else {
+        [_repeatIntervalStartButton.layer backgroundColorRed:0.5f green:0.0f blue:0.0f alpha:0.5f];
+    }
+    
+    if(_videoPlayerController.stateRepeatInterval == YES) {
+        [self setAttributeButton:_repeatIntervalButton title:[NSString stringWithFormat:@"A⇄B"] color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:21]];
+    } else {
+        [self setAttributeButton:_repeatIntervalButton title:[NSString stringWithFormat:@"A⇄B"] color:[NSColor redColor] font:[NSFont fontWithName:@"Feather" size:21]];
+    }
 }
 
 - (IBAction)repeatIntervalEndAction:(id)sender {
-    if(_videoPlayerController.endTime != _videoPlayerController.durationTime) {
-        [_videoPlayerController setEndTime:_videoPlayerController.durationTime];
-        [_repeatIntervalEndButton.layer backgroundColorRed:0.5f green:0.0f blue:0.0f alpha:0.5f];
-    } else {
-        if(_videoPlayerController.currentTime == _videoPlayerController.durationTime) {
-            return;
-        }
-        [_videoPlayerController setEndTime:_seekBarSlider.floatValue];
-        [_repeatIntervalEndButton.layer backgroundColorRed:0.0f green:0.0f blue:0.5f alpha:0.5f];
-    }
+    [_videoPlayerController setEndTime:_videoPlayerController.currentTime];
     [self setAttributeButton:_repeatIntervalEndButton title:[NSString changeTimeFloatToNSString:_videoPlayerController.endTime] color:[NSColor blackColor] font:[NSFont fontWithName:@"Feather" size:25]];
+    
+    if(_videoPlayerController.isEndTime == YES) {
+        [_repeatIntervalEndButton.layer backgroundColorRed:0.0f green:0.0f blue:0.5f alpha:0.5f];
+    } else {
+        [_repeatIntervalEndButton.layer backgroundColorRed:0.5f green:0.0f blue:0.0f alpha:0.5f];
+    }
+    
+    if(_videoPlayerController.stateRepeatInterval == YES) {
+        [self setAttributeButton:_repeatIntervalButton title:[NSString stringWithFormat:@"A⇄B"] color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:21]];
+    } else {
+        [self setAttributeButton:_repeatIntervalButton title:[NSString stringWithFormat:@"A⇄B"] color:[NSColor redColor] font:[NSFont fontWithName:@"Feather" size:21]];
+    }
+    
 }
-
 
 
 #pragma mark Mouse event

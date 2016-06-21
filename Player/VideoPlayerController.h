@@ -12,7 +12,6 @@
 
 - (id)initWithMediaFileURL:(NSURL*)fileURL andRect:(NSRect)frameRect;
 
-
 @property (nonatomic) float minRate;
 @property (nonatomic) float maxRate;
 
@@ -24,6 +23,8 @@
 
 @property (nonatomic) float startTime;
 @property (nonatomic) float endTime;
+@property (nonatomic, readonly) BOOL isStartTime;
+@property (nonatomic, readonly) BOOL isEndTime;
 @property (nonatomic, readonly) BOOL stateRepeatInterval;
 
 - (void)repeatIntervalTimerEnd;

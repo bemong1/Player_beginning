@@ -7,10 +7,13 @@
 //
 
 #import "VideoPlayerController.h"
+#import "RepeatIntervalController.h"
 
 #import "CALayer+AddMethod.h"
 
 @interface VideoPlayerController ()
+
+@property (nonatomic) RepeatIntervalController *repeatIntervalController;
 @property (strong) NSTimer *repeatIntervalTimer;
 
 @end
@@ -97,46 +100,56 @@
 }
 
 - (void)setStartTime:(float)startTime {
-    [self setStateRepeatInterval:YES];
-    _startTime = startTime;
-    
+    if(_isStartTime == NO) {
+        if(startTime != 0.0f) {
+            _isStartTime = YES;
+        } else {
+            _isStartTime = NO;
+        }
+        _startTime = startTime;
+    } else {
+        _startTime = 0.0f;
+        _isStartTime = NO;
+    }
 }
 
 - (void)setEndTime:(float)endTime {
-    [self setStateRepeatInterval:YES];
-    _endTime = endTime;
-    
-}
-
-- (void)setStateRepeatInterval:(BOOL)stateRepeatInterval {
-    if(_startTime != 0.0f || _endTime != self.durationTime) {
-        [self repeatIntervalTimerStart];
+    if(_isEndTime == NO) {
+        if(endTime != self.durationTime) {
+            _isEndTime = YES;
+        } else {
+            _isEndTime = NO;
+        }
+        _endTime = endTime;
     } else {
-        [self repeatIntervalTimerEnd];
-    }
+        _endTime = self.durationTime;
+        _isEndTime = NO;
+    }    
 }
 
-- (void)repeatIntervalTimerStart {
-    if(_repeatIntervalTimer == nil) {
-        _repeatIntervalTimer = [NSTimer scheduledTimerWithTimeInterval:(0.1) target:self selector:@selector(onRepeatIntervalTime:) userInfo:nil  repeats:YES];
-        [[NSRunLoop mainRunLoop] addTimer:_repeatIntervalTimer forMode:NSRunLoopCommonModes];
-        _stateRepeatInterval = YES;
-    }
-}
-
-- (void)repeatIntervalTimerEnd {
-    if([_repeatIntervalTimer isValid]) {
-        [_repeatIntervalTimer invalidate];
-        _repeatIntervalTimer = nil;
-        _stateRepeatInterval = NO;
+- (BOOL)stateRepeatInterval {
+    if(_isStartTime || _isEndTime) {
+        NSLog(@"repeatInterval ON!!");
+        if(_repeatIntervalTimer == nil) {
+            _repeatIntervalTimer = [NSTimer scheduledTimerWithTimeInterval:(0.1) target:self selector:@selector(onRepeatIntervalTime:) userInfo:nil  repeats:YES];
+            [[NSRunLoop mainRunLoop] addTimer:_repeatIntervalTimer forMode:NSRunLoopCommonModes];
+        }
+        return YES;
+    } else {
+        NSLog(@"repeatInterval!! OFF");
+        if([_repeatIntervalTimer isValid]) {
+            [_repeatIntervalTimer invalidate];
+            _repeatIntervalTimer = nil;
+        }
+        return NO;
     }
 }
 
 - (void)onRepeatIntervalTime:(NSTimer*)timer {
-    if(self.startTime - 0.01f > self.currentTime || self.endTime < self.currentTime) {
-        self.currentTime = self.startTime;
+    if(_startTime - 0.01f > self.currentTime || _endTime < self.currentTime) {
+        self.currentTime = _startTime;
     }
-    NSLog(@"start:%f, current:%f, end:%f", self.startTime, self.currentTime, self.endTime);
+    NSLog(@"start:%f, current:%f, end:%f", _startTime, self.currentTime, _endTime);
 }
 
 - (void)changeVideoResize {

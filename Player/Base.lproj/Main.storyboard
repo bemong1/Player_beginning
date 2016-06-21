@@ -1194,8 +1194,6 @@
                         <outlet property="repeatIntervalView" destination="bwZ-ME-mFu" id="atY-TX-gDN"/>
                         <outlet property="restorePlaybackRateButton" destination="iA8-Pl-2gR" id="9Rp-l6-DMy"/>
                         <outlet property="seekBarSlider" destination="2ou-Ql-Y2p" id="vUO-zM-ZGz"/>
-                        <outlet property="setRepeatIntervalEndButton" destination="Xhd-jf-Lch" id="ya3-Ap-H0J"/>
-                        <outlet property="setRepeatIntervalStartButton" destination="kYE-mD-LDT" id="GJc-2n-lAA"/>
                         <outlet property="stepBackwardButton" destination="Pjb-Tv-LJP" id="sdp-ty-45w"/>
                         <outlet property="stepForwardButton" destination="4YN-Eu-HcE" id="cer-aw-wXs"/>
                         <outlet property="stopButton" destination="r31-0Z-BSA" id="4Qe-Ev-LA7"/>

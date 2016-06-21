@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		E03141281D17BDB6005286EE /* VideoPlayerController.m in Sources */ = {isa = PBXBuildFile; fileRef = E03141271D17BDB6005286EE /* VideoPlayerController.m */; };
+		E031412B1D18FE1F005286EE /* RepeatIntervalController.m in Sources */ = {isa = PBXBuildFile; fileRef = E031412A1D18FE1F005286EE /* RepeatIntervalController.m */; };
 		E0368D911D0E8D4D008C92CB /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E0368D901D0E8D4D008C92CB /* AppDelegate.m */; };
 		E0368D941D0E8D4D008C92CB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E0368D931D0E8D4D008C92CB /* main.m */; };
 		E0368D971D0E8D4D008C92CB /* MediaFileExplorer.m in Sources */ = {isa = PBXBuildFile; fileRef = E0368D961D0E8D4D008C92CB /* MediaFileExplorer.m */; };
@@ -23,6 +24,8 @@
 /* Begin PBXFileReference section */
 		E03141261D17BDB6005286EE /* VideoPlayerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoPlayerController.h; sourceTree = "<group>"; };
 		E03141271D17BDB6005286EE /* VideoPlayerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VideoPlayerController.m; sourceTree = "<group>"; };
+		E03141291D18FE1F005286EE /* RepeatIntervalController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RepeatIntervalController.h; sourceTree = "<group>"; };
+		E031412A1D18FE1F005286EE /* RepeatIntervalController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RepeatIntervalController.m; sourceTree = "<group>"; };
 		E0368D8C1D0E8D4D008C92CB /* Player.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Player.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E0368D8F1D0E8D4D008C92CB /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		E0368D901D0E8D4D008C92CB /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -82,6 +85,8 @@
 				E0D0E9121D10F66300F0D4CF /* PlayerController.m */,
 				E03141261D17BDB6005286EE /* VideoPlayerController.h */,
 				E03141271D17BDB6005286EE /* VideoPlayerController.m */,
+				E03141291D18FE1F005286EE /* RepeatIntervalController.h */,
+				E031412A1D18FE1F005286EE /* RepeatIntervalController.m */,
 				E0D0E9131D10F66300F0D4CF /* VideoPlayerViewController.h */,
 				E0D0E9141D10F66300F0D4CF /* VideoPlayerViewController.m */,
 				E0D0E9191D10F66300F0D4CF /* CALayer+AddMethod.h */,
@@ -179,6 +184,7 @@
 				E0368D971D0E8D4D008C92CB /* MediaFileExplorer.m in Sources */,
 				E0D0E9221D10F66300F0D4CF /* NSString+AddMethod.m in Sources */,
 				E0368D941D0E8D4D008C92CB /* main.m in Sources */,
+				E031412B1D18FE1F005286EE /* RepeatIntervalController.m in Sources */,
 				E03141281D17BDB6005286EE /* VideoPlayerController.m in Sources */,
 				E0D0E91D1D10F66300F0D4CF /* PlayerController.m in Sources */,
 				E0368D911D0E8D4D008C92CB /* AppDelegate.m in Sources */,
