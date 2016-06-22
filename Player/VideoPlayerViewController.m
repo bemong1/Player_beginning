@@ -137,10 +137,12 @@ void *StateRateContext = &StateRateContext;
 
 - (void)onPlayerControllerPlaybackStateDidChangeNotification {
     if(_videoPlayerController.playbackState == PlaybackStatePlaying) {
+        [_loadStateProgressIndicator stopAnimation:nil];
+        _loadStateProgressIndicator.hidden = YES;
         [self setAttributeButton:_playOrPauseButton title:@"" color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:25]];
         
         if(_showPlaybackTimer == nil) {
-            _showPlaybackTimer = [NSTimer scheduledTimerWithTimeInterval:(0.5) target:self selector:@selector(onShowPlaybackTime:) userInfo:nil  repeats:YES];
+            _showPlaybackTimer = [NSTimer scheduledTimerWithTimeInterval:(0.3) target:self selector:@selector(onShowPlaybackTime:) userInfo:nil  repeats:YES];
             [[NSRunLoop mainRunLoop] addTimer:_showPlaybackTimer forMode:NSRunLoopCommonModes];
         }
     } else if(_videoPlayerController.playbackState == PlaybackStatePaused) {
@@ -150,8 +152,12 @@ void *StateRateContext = &StateRateContext;
             [_showPlaybackTimer invalidate];
             _showPlaybackTimer = nil;
         }
-    } else if(_videoPlayerController.playbackState == PlaybackStateFailed) {
-        NSLog(@"PlaybackFailed!");
+    } else if(_videoPlayerController.playbackState == PlaybackStateBuffering) {
+        _loadStateProgressIndicator.hidden = NO;
+        [_loadStateProgressIndicator startAnimation:nil];
+    } else if(_videoPlayerController.playbackState == PlaybackStatePlayable) {
+        [_loadStateProgressIndicator startAnimation:nil];
+        _loadStateProgressIndicator.hidden = YES;
     }
 }
 
@@ -166,6 +172,8 @@ void *StateRateContext = &StateRateContext;
         
         [self.view.window setContentSize:[_videoPlayerController originalSize]];
         
+        
+        _repeatIntervalController = [[RepeatIntervalController alloc]initWithDurationTime:_videoPlayerController.durationTime];
         [self setAttributeButton:_repeatIntervalStartButton title:[NSString changeTimeFloatToNSString:0.0f] color:[NSColor blackColor] font:[NSFont fontWithName:@"Feather" size:25]];
         [_repeatIntervalStartButton.layer backgroundColorRed:0.5f green:0.0f blue:0.0f alpha:0.5f];
         [self setAttributeButton:_repeatIntervalEndButton title:[NSString changeTimeFloatToNSString:_videoPlayerController.durationTime] color:[NSColor blackColor] font:[NSFont fontWithName:@"Feather" size:25]];
@@ -182,7 +190,6 @@ void *StateRateContext = &StateRateContext;
         _currentTimeViewButton.title = [NSString changeTimeFloatToNSString:_videoPlayerController.currentTime];
         _durationTimeViewButton.title = [NSString changeTimeFloatToNSString:_videoPlayerController.durationTime];
         
-        _repeatIntervalController = [[RepeatIntervalController alloc]initWithDurationTime:_videoPlayerController.durationTime];
 
     } else if(_videoPlayerController.loadState == LoadStateFailed) {
         [self setEnabledSubControllers:NO];
@@ -198,12 +205,9 @@ void *StateRateContext = &StateRateContext;
 
 - (void)onPlayerControllerPlaybackDidPlayToEndTimeNotification {
     [_videoPlayerController pause];
+    
     if(_videoPlayerController.repeat == YES) {
         [_videoPlayerController setCurrentTime:0.0f];
-        [_videoPlayerController play];
-    }
-    if(_repeatIntervalController.stateRepeatInterval == YES) {
-        [_videoPlayerController setCurrentTime:_repeatIntervalController.startTime];
         [_videoPlayerController play];
     }
 }
@@ -219,7 +223,9 @@ void *StateRateContext = &StateRateContext;
     _durationTimeViewButton.title = [NSString changeTimeFloatToNSString:_videoPlayerController.durationTime];
     
     if(_repeatIntervalController.stateRepeatInterval == YES) {
-        _videoPlayerController.currentTime = [_repeatIntervalController executeRepeatInterval:_videoPlayerController.currentTime];
+        if([_repeatIntervalController isCurrentTimeBetweenStartTimeAndEndTime:_videoPlayerController.currentTime] == NO) {
+            _videoPlayerController.currentTime = _repeatIntervalController.startTime;
+        }
     }
 }
 
@@ -237,6 +243,16 @@ void *StateRateContext = &StateRateContext;
     
     [_videoPlayerController removeFromSuperviewWithoutNeedingDisplay];
     _videoPlayerController = nil;
+    
+    [self removePlayerViewController];
+}
+
+- (void)removePlayerViewController {
+    if(_delegate) {
+        if([_delegate respondsToSelector:@selector(removePlayerViewController)]) {
+            [_delegate removePlayerViewController];
+        }
+    }    
 }
 
 

@@ -9,9 +9,18 @@
 #import <Cocoa/Cocoa.h>
 
 #import "PlayerController.h"
+#import "MediaFileExplorer.h"
 #import "VideoPlayerController.h"
 
-@interface VideoPlayerViewController : NSViewController
+@protocol MediaFileExplorerDelegate <NSObject>
+
+- (void)removePlayerViewController;
+
+@end
+
+@interface VideoPlayerViewController : NSViewController <MediaFileExplorerDelegate>
+
+@property (nonatomic, weak) id <MediaFileExplorerDelegate> delegate;
 
 @property (nonatomic) VideoPlayerController *videoPlayerController;
 

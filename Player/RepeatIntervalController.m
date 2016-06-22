@@ -56,12 +56,12 @@
     }
 }
 
-- (float)executeRepeatInterval:(float)currentTime {
-    if(_startTime - 0.01f > currentTime || _endTime < currentTime) {
-        return _startTime;
+- (BOOL)isCurrentTimeBetweenStartTimeAndEndTime:(float)currentTime {
+    if(_startTime - 0.01f > currentTime || _endTime <= currentTime) {
+        return NO;
     }
     NSLog(@"start:%f, current:%f, end:%f", _startTime, currentTime, _endTime);
-    return currentTime;
+    return YES;
 }
 
 @end

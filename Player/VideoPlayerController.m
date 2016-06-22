@@ -62,7 +62,7 @@
 - (void)playOrPause {
     if(self.playbackState == PlaybackStatePlaying) {
         [self pause];
-    } else if(self.playbackState == PlaybackStatePaused) {
+    } else {
         [self play];
     }
 }

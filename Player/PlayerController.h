@@ -30,7 +30,8 @@ extern NSString *const PlayerControllerRateDidChangeNotification;
 typedef NS_ENUM(NSInteger, PlaybackState) {
     PlaybackStatePaused,
     PlaybackStatePlaying,
-    PlaybackStateFailed
+    PlaybackStateBuffering,
+    PlaybackStatePlayable,
 };
 
 typedef NS_ENUM(NSInteger, LoadState) {

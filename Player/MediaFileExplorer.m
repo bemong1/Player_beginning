@@ -130,6 +130,7 @@
 - (void)createPlayerViewController:(NSString*)fileName {
     NSStoryboard *storyboard = [NSStoryboard storyboardWithName:@"Main" bundle:nil];
     _videoPlayerViewController = [storyboard instantiateControllerWithIdentifier:@"playerViewController"];
+    [_videoPlayerViewController setDelegate:(id)self];
     [self presentViewControllerAsModalWindow:_videoPlayerViewController];
     
     NSString* aFilePathUsingURL = [NSString stringWithFormat:@"file://"];
@@ -138,6 +139,10 @@
     
     NSURL* fileURL = [NSURL URLWithString:aFilePathUsingURL];
     [_videoPlayerViewController loadMediaFile:fileURL];
+}
+
+- (void)removePlayerViewController {
+    _videoPlayerViewController = nil;
 }
 
 
@@ -177,6 +182,14 @@
         }
     } else {
         NSLog(@"Fail");
+        NSURL *url = [NSURL URLWithString:@"http://eng-media-02.cdngc.net/cdnlab/cs1/mega/sample_studio.MP4"];
+        NSStoryboard *storyboard = [NSStoryboard storyboardWithName:@"Main" bundle:nil];
+        _videoPlayerViewController = [storyboard instantiateControllerWithIdentifier:@"playerViewController"];
+        [_videoPlayerViewController setDelegate:(id)self];
+        [self presentViewControllerAsModalWindow:_videoPlayerViewController];
+        
+        
+        [_videoPlayerViewController loadMediaFile:url];
     }
     [self.view.window setTitle:_currentDirectoryURL];
 }
