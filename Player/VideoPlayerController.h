@@ -8,9 +8,11 @@
 
 #import "PlayerController.h"
 
-@interface VideoPlayerController : PlayerController
+@interface VideoPlayerController : PlayerController 
+
 
 - (id)initWithMediaFileURL:(NSURL*)fileURL andRect:(NSRect)frameRect;
+
 
 @property (nonatomic) float minRate;
 @property (nonatomic) float maxRate;
@@ -21,22 +23,14 @@
 @property (nonatomic) BOOL shuffle;
 @property (nonatomic) BOOL mute;
 
-@property (nonatomic) float startTime;
-@property (nonatomic) float endTime;
-@property (nonatomic, readonly) BOOL isStartTime;
-@property (nonatomic, readonly) BOOL isEndTime;
-@property (nonatomic, readonly) BOOL stateRepeatInterval;
-
-- (void)invalidateTimer;
-
 - (void)playOrPause;
 
 - (void)increasePlaybackRate;
 - (void)restorePlaybackRate;
 - (void)decreasePlaybackRate;
+
 - (void)changeVideoGravity;
 - (void)changeVideoResize:(float)scale;
-
 
 - (void)stepBackward;
 - (void)stepForward;

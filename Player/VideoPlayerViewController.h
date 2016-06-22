@@ -22,9 +22,6 @@
 
 @property (nonatomic, weak) id <MediaFileExplorerDelegate> delegate;
 
-@property (nonatomic) VideoPlayerController *videoPlayerController;
-
 - (void)loadMediaFile:(NSURL*)url;
-- (void)stopMediaFile;
 
 @end

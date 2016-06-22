@@ -13,10 +13,12 @@
 
 @interface URLListViewController : NSViewController
 
+@property (nonatomic) URLList *urlList;
+
 #pragma mark URLList Controller
 
-- (void)add;
-- (void)remove;
+
+- (void)loadURLListInTableView;
 
 
 @end

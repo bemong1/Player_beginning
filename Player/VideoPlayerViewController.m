@@ -15,6 +15,7 @@
 
 @interface VideoPlayerViewController ()
 
+@property (nonatomic) VideoPlayerController *videoPlayerController;
 @property (nonatomic) RepeatIntervalController *repeatIntervalController;
 
 @property (strong) IBOutlet NSView *topView;
@@ -121,7 +122,22 @@ void *StateRateContext = &StateRateContext;
 
 - (void)dismissController:(id)sender {
     [super dismissController:sender];
-    [self stopMediaFile];
+    
+    [_videoPlayerController pause];
+    [self removeNotifications:_videoPlayerController];
+    
+    [_videoPlayerController removeFromSuperviewWithoutNeedingDisplay];
+    _videoPlayerController = nil;
+    
+    [self removePlayerViewController];
+}
+
+- (void)removePlayerViewController {
+    if(_delegate) {
+        if([_delegate respondsToSelector:@selector(removePlayerViewController)]) {
+            [_delegate removePlayerViewController];
+        }
+    }
 }
 
 - (void)setNotifications:(id)videoPlayerController {
@@ -142,7 +158,7 @@ void *StateRateContext = &StateRateContext;
         [self setAttributeButton:_playOrPauseButton title:@"" color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:25]];
         
         if(_showPlaybackTimer == nil) {
-            _showPlaybackTimer = [NSTimer scheduledTimerWithTimeInterval:(0.3) target:self selector:@selector(onShowPlaybackTime:) userInfo:nil  repeats:YES];
+            _showPlaybackTimer = [NSTimer scheduledTimerWithTimeInterval:(0.1) target:self selector:@selector(onShowPlaybackTime:) userInfo:nil  repeats:YES];
             [[NSRunLoop mainRunLoop] addTimer:_showPlaybackTimer forMode:NSRunLoopCommonModes];
         }
     } else if(_videoPlayerController.playbackState == PlaybackStatePaused) {
@@ -213,7 +229,6 @@ void *StateRateContext = &StateRateContext;
 }
 
 - (void)onPlayerControllerRateDidPlayToEndTimeNotification {
-    [self setAttributeButton:_restorePlaybackRateButton title:[NSString stringWithFormat:@"%.1fx", _videoPlayerController.rate] color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:23]];
     NSLog(@"Rate!");
 }
 
@@ -223,7 +238,7 @@ void *StateRateContext = &StateRateContext;
     _durationTimeViewButton.title = [NSString changeTimeFloatToNSString:_videoPlayerController.durationTime];
     
     if(_repeatIntervalController.stateRepeatInterval == YES) {
-        if([_repeatIntervalController isCurrentTimeBetweenStartTimeAndEndTime:_videoPlayerController.currentTime] == NO) {
+        if([_repeatIntervalController isCurrentTimeBetweenStartTimeToEndTime:_videoPlayerController.currentTime] == NO) {
             _videoPlayerController.currentTime = _repeatIntervalController.startTime;
         }
     }
@@ -236,25 +251,6 @@ void *StateRateContext = &StateRateContext;
     [self setNotifications:_videoPlayerController];
 }
 
-- (void)stopMediaFile {
-    [_videoPlayerController pause];
-    [self removeNotifications:_videoPlayerController];
-    [_videoPlayerController invalidateTimer];
-    
-    [_videoPlayerController removeFromSuperviewWithoutNeedingDisplay];
-    _videoPlayerController = nil;
-    
-    [self removePlayerViewController];
-}
-
-- (void)removePlayerViewController {
-    if(_delegate) {
-        if([_delegate respondsToSelector:@selector(removePlayerViewController)]) {
-            [_delegate removePlayerViewController];
-        }
-    }    
-}
-
 
 #pragma mark Playback Controller Button
 
@@ -262,21 +258,19 @@ void *StateRateContext = &StateRateContext;
     [_videoPlayerController playOrPause];
 }
 
-- (IBAction)stopAction:(id)sender {
-    [self stopMediaFile];
-    [self.view setHidden:YES];
-}
-
 - (IBAction)increasePlaybackRateAction:(id)sender {
     [_videoPlayerController increasePlaybackRate];
+    [self setAttributeButton:_restorePlaybackRateButton title:[NSString stringWithFormat:@"%.1fx", _videoPlayerController.rate] color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:23]];
 }
 
 - (IBAction)restorePlaybackRateAction:(id)sender {
     [_videoPlayerController restorePlaybackRate];
+    [self setAttributeButton:_restorePlaybackRateButton title:[NSString stringWithFormat:@"%.1fx", _videoPlayerController.rate] color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:23]];
 }
 
 - (IBAction)decreasePlaybackRateAction:(id)sender {
     [_videoPlayerController decreasePlaybackRate];
+    [self setAttributeButton:_restorePlaybackRateButton title:[NSString stringWithFormat:@"%.1fx", _videoPlayerController.rate] color:[NSColor blueColor] font:[NSFont fontWithName:@"Feather" size:23]];
 }
 
 - (IBAction)stepForwardAction:(id)sender {

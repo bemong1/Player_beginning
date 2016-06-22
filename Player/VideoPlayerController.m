@@ -10,11 +10,6 @@
 
 #import "CALayer+AddMethod.h"
 
-@interface VideoPlayerController ()
-@property (strong) NSTimer *repeatIntervalTimer;
-
-@end
-
 
 @implementation VideoPlayerController
 
@@ -31,7 +26,6 @@
 - (void)playerDidReadyToPlay {
     [super playerDidReadyToPlay];
     
-    _endTime = self.durationTime;
     [self setRate:1.0f];
 }
 
@@ -83,64 +77,6 @@
     if(self.rate < (_minRate + 0.05f)) {
         self.rate = _minRate;
     }
-}
-
-- (void)setStartTime:(float)startTime {
-    if(_isStartTime == NO) {
-        if(self.currentTime != 0.0f) {
-            _isStartTime = YES;
-        } else {
-            _isStartTime = NO;
-        }
-        _startTime = self.currentTime;
-    } else {
-        _startTime = 0.0f;
-        _isStartTime = NO;
-    }
-}
-
-- (void)setEndTime:(float)endTime {
-    if(_isEndTime == NO) {
-        if(self.currentTime != self.durationTime) {
-            _isEndTime = YES;
-        } else {
-            _isEndTime = NO;
-        }
-        _endTime = self.currentTime;
-    } else {
-        _endTime = self.durationTime;
-        _isEndTime = NO;
-    }
-}
-
-- (BOOL)stateRepeatInterval {
-    if(_isStartTime || _isEndTime) {
-        [self fireTimer];
-        return YES;
-    } else {
-        [self invalidateTimer];
-        return NO;
-    }
-}
-
-- (void)fireTimer {
-    if(_repeatIntervalTimer == nil) {
-        _repeatIntervalTimer = [NSTimer scheduledTimerWithTimeInterval:(0.1) target:self selector:@selector(onRepeatIntervalTime:) userInfo:nil  repeats:YES];
-        [[NSRunLoop mainRunLoop] addTimer:_repeatIntervalTimer forMode:NSRunLoopCommonModes];
-    }
-}
-- (void)invalidateTimer {
-    if([_repeatIntervalTimer isValid]) {
-        [_repeatIntervalTimer invalidate];
-        _repeatIntervalTimer = nil;
-    }
-}
-
-- (void)onRepeatIntervalTime:(NSTimer*)timer {
-    if(self.startTime - 0.01f > self.currentTime || self.endTime < self.currentTime) {
-        self.currentTime = self.startTime;
-    }
-//    NSLog(@"start:%f, current:%f, end:%f", self.startTime, self.currentTime, self.endTime);
 }
 
 - (void)changeVideoGravity {

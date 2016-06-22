@@ -10,9 +10,15 @@
 
 #import "VideoPlayerViewController.h"
 
+#import "URLList.h"
+#import "URLListViewController.h"
+
+
 @interface MediaFileExplorer ()
 
 @property (nonatomic) VideoPlayerViewController *videoPlayerViewController;
+@property (nonatomic) URLList *urlList;
+@property (nonatomic) URLListViewController *urlListViewController;
 
 @property (nonatomic) IBOutlet NSTableView *tableView;
 
@@ -128,17 +134,38 @@
 }
 
 - (void)createPlayerViewController:(NSString*)fileName {
-    NSStoryboard *storyboard = [NSStoryboard storyboardWithName:@"Main" bundle:nil];
-    _videoPlayerViewController = [storyboard instantiateControllerWithIdentifier:@"playerViewController"];
-    [_videoPlayerViewController setDelegate:(id)self];
-    [self presentViewControllerAsModalWindow:_videoPlayerViewController];
+//    NSStoryboard *videoPlayerViewControllerStoryboard = [NSStoryboard storyboardWithName:@"Main" bundle:nil];
+//    _videoPlayerViewController = [videoPlayerViewControllerStoryboard instantiateControllerWithIdentifier:@"videoPlayerViewController"];
+//    [_videoPlayerViewController setDelegate:(id)self];
+//    [self presentViewControllerAsModalWindow:_videoPlayerViewController];
+//    
+//    NSString* aFilePathUsingURL = [NSString stringWithFormat:@"file://"];
+//    aFilePathUsingURL = [aFilePathUsingURL stringByAppendingString:[self setURLOfFile:fileName]];
+//    aFilePathUsingURL = [aFilePathUsingURL stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+//    
+//    NSURL* fileURL = [NSURL URLWithString:aFilePathUsingURL];
+//    [_videoPlayerViewController loadMediaFile:fileURL];
     
-    NSString* aFilePathUsingURL = [NSString stringWithFormat:@"file://"];
-    aFilePathUsingURL = [aFilePathUsingURL stringByAppendingString:[self setURLOfFile:fileName]];
-    aFilePathUsingURL = [aFilePathUsingURL stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    NSStoryboard *urlListViewControllerStoryboard = [NSStoryboard storyboardWithName:@"Main" bundle:nil];
+    _urlListViewController = [urlListViewControllerStoryboard instantiateControllerWithIdentifier:@"urlListViewController"];
+    [self presentViewControllerAsModalWindow:_urlListViewController];
+    _urlList = [[URLList alloc]init];
+    [_urlListViewController setUrlList:_urlList];
     
-    NSURL* fileURL = [NSURL URLWithString:aFilePathUsingURL];
-    [_videoPlayerViewController loadMediaFile:fileURL];
+    for(id object in _fileNamesInCurrentDirectory) {
+        
+        if([self fileType:object] != NSFileTypeDirectory) {
+        NSString* aFilePathUsingURL = [NSString stringWithFormat:@"file://"];
+        aFilePathUsingURL = [aFilePathUsingURL stringByAppendingString:[self setURLOfFile:object]];
+        aFilePathUsingURL = [aFilePathUsingURL stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+        
+        NSURL* fileURL = [NSURL URLWithString:aFilePathUsingURL];
+        
+        [_urlList addURL:fileURL];
+        }
+    }
+    
+    [_urlListViewController loadURLListInTableView];
 }
 
 - (void)removePlayerViewController {

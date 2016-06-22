@@ -75,8 +75,16 @@ NSString *const PlayerControllerRateDidChangeNotification = @"PlayerControllerRa
     
     if (context == PlaybackLikelyToKeepUp) {
         if (_player.currentItem.playbackLikelyToKeepUp) {
+            PlaybackState tempState = _playbackState;
+            
             [self setPlaybackState:PlaybackStatePlayable];
             NSLog(@"Playable");
+            
+            if(tempState == PlaybackStatePlaying || tempState == PlaybackStateBuffering) {
+                [self play];
+            } else if(tempState == PlaybackStatePaused) {
+                [self pause];
+            }            
         }
     }
     if (context == PlaybackBufferEmpty) {
@@ -90,6 +98,9 @@ NSString *const PlayerControllerRateDidChangeNotification = @"PlayerControllerRa
         if(_player.rate == 0.0f) {
             [self setPlaybackState:PlaybackStatePaused];
             NSLog(@"Pause");
+        } else {
+            [self setPlaybackState:PlaybackStatePlaying];
+            NSLog(@"Play");
         }
         if(change[NSKeyValueChangeNewKey] != change[NSKeyValueChangeOldKey]) {
             [[NSNotificationCenter defaultCenter] postNotificationName:PlayerControllerRateDidChangeNotification object:self];            
@@ -100,9 +111,8 @@ NSString *const PlayerControllerRateDidChangeNotification = @"PlayerControllerRa
     if(context == PlaybackLoadedTimeRanges) {
         NSArray *timeRanges = (NSArray *)[change objectForKey:NSKeyValueChangeNewKey];
         if (timeRanges && [timeRanges count]) {
-            CMTimeRange timeRange = [[timeRanges objectAtIndex:0] CMTimeRangeValue];
-            NSLog(@" . . . %.5f -> %.5f", CMTimeGetSeconds(timeRange.start), CMTimeGetSeconds(CMTimeAdd(timeRange.start, timeRange.duration)));
-            
+//            CMTimeRange timeRange = [[timeRanges objectAtIndex:0] CMTimeRangeValue];
+//            NSLog(@" . . . %.5f -> %.5f", CMTimeGetSeconds(timeRange.start), CMTimeGetSeconds(CMTimeAdd(timeRange.start, timeRange.duration)));
             if(!_player.currentItem.playbackLikelyToKeepUp) {
                 NSLog(@"Buffering");
                 [self setPlaybackState:PlaybackStateBuffering];
@@ -148,8 +158,7 @@ NSString *const PlayerControllerRateDidChangeNotification = @"PlayerControllerRa
                 [_player.currentItem addObserver:self forKeyPath:@"playbackBufferEmpty" options:0 context:PlaybackBufferEmpty];
                 [_player.currentItem addObserver:self forKeyPath:@"playbackLikelyToKeepUp" options:0 context:PlaybackLikelyToKeepUp];
                 [_player.currentItem addObserver:self forKeyPath:@"playbackBufferFull" options:0 context:PlaybackBufferFull];
-                [_player.currentItem addObserver:self forKeyPath:@"loadedTimeRanges" options:NSKeyValueObservingOptionNew
-                            context:PlaybackLoadedTimeRanges];
+                [_player.currentItem addObserver:self forKeyPath:@"loadedTimeRanges" options:NSKeyValueObservingOptionNew context:PlaybackLoadedTimeRanges];
             } else {
                 [self setLoadState:LoadStateFailed];
                 NSLog(@"%@", error);
@@ -171,9 +180,7 @@ NSString *const PlayerControllerRateDidChangeNotification = @"PlayerControllerRa
 
 - (void)play {
     if (_player.currentItem.playbackLikelyToKeepUp) {
-        NSLog(@"Play");
         _player.rate = _rate;
-        [self setPlaybackState:PlaybackStatePlaying];
     }
 }
 

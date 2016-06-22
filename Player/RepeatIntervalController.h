@@ -20,6 +20,6 @@
 @property (nonatomic, readonly) BOOL isEndTime;
 @property (nonatomic, readonly) BOOL stateRepeatInterval;
 
-- (BOOL)isCurrentTimeBetweenStartTimeAndEndTime:(float)currentTime;
+- (BOOL)isCurrentTimeBetweenStartTimeToEndTime:(float)currentTime;
 
 @end

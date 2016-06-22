@@ -9,20 +9,13 @@
 #import "URLListViewController.h"
 
 #import "AppDelegate.h"
-#import "PlayerViewController.h"
+#import "VideoPlayerViewController.h"
 
 
 @interface URLListViewController ()
 
 @property (nonatomic) IBOutlet NSTableView *tableView;
-
-@property (nonatomic) AppDelegate *appDelegate;
-
-@property (nonatomic) URLList *urlList;
-@property (nonatomic) PlayerViewController *playerViewController;
-
-- (IBAction)addAction:(id)sender;
-- (IBAction)removeAction:(id)sender;
+@property (nonatomic) VideoPlayerViewController *videoPlayerViewController;
 
 @end
 
@@ -34,28 +27,9 @@ static void *URLListContext = &URLListContext;
 #pragma mark Init and Dealloc
 
 - (void)viewDidLoad {
-    _appDelegate = [[NSApplication sharedApplication] delegate];
-    
-    NSStoryboard *storyboard = [NSStoryboard storyboardWithName:@"Main" bundle:nil];
-    _playerViewController = [storyboard instantiateControllerWithIdentifier:@"playerViewController"];
-    NSView* playerView = _playerViewController.view;
-    playerView.translatesAutoresizingMaskIntoConstraints = NO;
-    [self.view addSubview:playerView];
-    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-0-[playerView]-0-|"
-                                                                      options:NSLayoutFormatAlignAllCenterY
-                                                                      metrics:nil
-                                                                        views:NSDictionaryOfVariableBindings(self.view, playerView)]];
-    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-0-[playerView]-0-|"
-                                                                      options:NSLayoutFormatAlignAllCenterX
-                                                                      metrics:nil
-                                                                        views:NSDictionaryOfVariableBindings(self.view, playerView)]];
-    [playerView setHidden:YES];
-    [playerView setAlphaValue:0.9f];
-    
     [_tableView setTarget:self];
-    [_tableView setDoubleAction:@selector(doubleClickEvent:)];
+    [_tableView setDoubleAction:@selector(doubleClickEvent:)];    
     
-    _urlList = [URLList sharedURLList];
     [_urlList addObserver:self forKeyPath:@"cursor" options:0 context:URLListContext];
 }
 
@@ -105,50 +79,6 @@ static void *URLListContext = &URLListContext;
 
 #pragma mark URLList Controller
 
-- (void)add {
-    NSOpenPanel *panel = [NSOpenPanel openPanel];
-    NSArray* fileTypes = @[@"mp3", @"mp4", @"mov"];
-    
-    panel.canChooseDirectories = YES;
-    panel.allowsMultipleSelection = YES;
-    panel.allowedFileTypes = fileTypes;
-    
-    [panel beginWithCompletionHandler:^(NSInteger result) {
-        if(result == NSFileHandlingPanelOKButton) {
-            NSArray* _fileURLs = [panel URLs];
-            
-            if([_fileURLs count] > 0) {
-                for(NSURL* object in _fileURLs) {
-                    [_urlList addURL:object];
-                }
-            }
-            [_urlList setCurrentCursor:0];
-        }
-    }];
-    
-    if ([_tableView numberOfRows] > 0) {
-        [_tableView scrollRowToVisible:[_tableView numberOfRows] - 1];
-    }
-}
-
-- (void)remove {
-    if([_tableView selectedRow] != -1) {
-        [_urlList removeURL:[_tableView selectedRow]];
-    }
-    [self loadURLListInTableView];
-}
-
-
-#pragma mark URLList Controller Button
-
-- (IBAction)addAction:(id)sender {
-    [self add];
-}
-
-- (IBAction)removeAction:(id)sender {
-    [self remove];
-}
-
 
 #pragma mark Mouse event
 
@@ -156,10 +86,9 @@ static void *URLListContext = &URLListContext;
     if([_tableView selectedRow] != -1) {
         [_urlList setCurrentCursor:[_tableView selectedRow]];
         
-        [_playerViewController.view setHidden:NO];        
+        [_videoPlayerViewController.view setHidden:NO];
         
-        [_playerViewController stopMediaFile];
-        [_playerViewController loadMediaFile:[_urlList getURLFromCurrentCursor]];
+        [_videoPlayerViewController loadMediaFile:[_urlList getURLFromCurrentCursor]];
     }
 }
 

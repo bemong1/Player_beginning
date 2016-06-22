@@ -56,11 +56,11 @@
     }
 }
 
-- (BOOL)isCurrentTimeBetweenStartTimeAndEndTime:(float)currentTime {
+- (BOOL)isCurrentTimeBetweenStartTimeToEndTime:(float)currentTime {
     if(_startTime - 0.01f > currentTime || _endTime <= currentTime) {
         return NO;
     }
-    NSLog(@"start:%f, current:%f, end:%f", _startTime, currentTime, _endTime);
+//    NSLog(@"start:%f, current:%f, end:%f", _startTime, currentTime, _endTime);
     return YES;
 }
 
