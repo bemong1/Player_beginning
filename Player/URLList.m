@@ -19,19 +19,6 @@
 
 @implementation URLList
 
-#pragma mark Singleton instance
-
-//+ (URLList*)sharedURLList {
-//    static dispatch_once_t pred;
-//    static URLList *shared = nil;
-//    
-//    dispatch_once(&pred, ^{
-//        shared = [[URLList alloc]init];
-//    });
-//    return shared;
-//}
-
-
 #pragma mark Init
 
 - (id)init {

@@ -8,15 +8,12 @@
 
 #import "MediaFileExplorer.h"
 
-#import "VideoPlayerViewController.h"
-
 #import "URLList.h"
 #import "URLListViewController.h"
 
 
 @interface MediaFileExplorer ()
 
-@property (nonatomic) VideoPlayerViewController *videoPlayerViewController;
 @property (nonatomic) URLList *urlList;
 @property (nonatomic) URLListViewController *urlListViewController;
 
@@ -133,43 +130,38 @@
     [self setCurrentDirectoryURL:[self setURLOfFile:directoryName]];
 }
 
-- (void)createPlayerViewController:(NSString*)fileName {
-//    NSStoryboard *videoPlayerViewControllerStoryboard = [NSStoryboard storyboardWithName:@"Main" bundle:nil];
-//    _videoPlayerViewController = [videoPlayerViewControllerStoryboard instantiateControllerWithIdentifier:@"videoPlayerViewController"];
-//    [_videoPlayerViewController setDelegate:(id)self];
-//    [self presentViewControllerAsModalWindow:_videoPlayerViewController];
-//    
-//    NSString* aFilePathUsingURL = [NSString stringWithFormat:@"file://"];
-//    aFilePathUsingURL = [aFilePathUsingURL stringByAppendingString:[self setURLOfFile:fileName]];
-//    aFilePathUsingURL = [aFilePathUsingURL stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
-//    
-//    NSURL* fileURL = [NSURL URLWithString:aFilePathUsingURL];
-//    [_videoPlayerViewController loadMediaFile:fileURL];
-    
+- (void)createURLListViewController:(NSString*)fileName {
+
     NSStoryboard *urlListViewControllerStoryboard = [NSStoryboard storyboardWithName:@"Main" bundle:nil];
     _urlListViewController = [urlListViewControllerStoryboard instantiateControllerWithIdentifier:@"urlListViewController"];
     [self presentViewControllerAsModalWindow:_urlListViewController];
     _urlList = [[URLList alloc]init];
     [_urlListViewController setUrlList:_urlList];
     
+    int count = 0;
     for(id object in _fileNamesInCurrentDirectory) {
         
-        if([self fileType:object] != NSFileTypeDirectory) {
-        NSString* aFilePathUsingURL = [NSString stringWithFormat:@"file://"];
-        aFilePathUsingURL = [aFilePathUsingURL stringByAppendingString:[self setURLOfFile:object]];
-        aFilePathUsingURL = [aFilePathUsingURL stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
-        
-        NSURL* fileURL = [NSURL URLWithString:aFilePathUsingURL];
-        
-        [_urlList addURL:fileURL];
+        if([self fileType:object] == NSFileTypeRegular) {
+            NSString* aFilePathUsingURL = [NSString stringWithFormat:@"file://"];
+            aFilePathUsingURL = [aFilePathUsingURL stringByAppendingString:[self setURLOfFile:object]];
+            aFilePathUsingURL = [aFilePathUsingURL stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+            
+            NSURL* fileURL = [NSURL URLWithString:aFilePathUsingURL];
+            
+            [_urlList addURL:fileURL];
+            
+            if([object isEqualToString:fileName]) {
+                NSLog(@"cursor : %d", count);
+                [_urlList setCurrentCursor:count];
+            }
+            count++;
         }
     }
     
+    //Temp Media File using Buffering Test
+    NSURL *url = [NSURL URLWithString:@"http://eng-media-02.cdngc.net/cdnlab/cs1/mega/sample_studio.MP4"];
+    [_urlList addURL:url];
     [_urlListViewController loadURLListInTableView];
-}
-
-- (void)removePlayerViewController {
-    _videoPlayerViewController = nil;
 }
 
 
@@ -205,18 +197,10 @@
             [self moveToSubDirectory:[_fileNamesInCurrentDirectory objectAtIndex:[_tableView selectedRow]]];
             [_tableView reloadData];
         } else if([self fileType:[_fileNamesInCurrentDirectory objectAtIndex:[_tableView selectedRow]]] == NSFileTypeRegular){
-            [self createPlayerViewController:[_fileNamesInCurrentDirectory objectAtIndex:[_tableView selectedRow]]];
+            [self createURLListViewController:[_fileNamesInCurrentDirectory objectAtIndex:[_tableView selectedRow]]];
         }
     } else {
         NSLog(@"Fail");
-        NSURL *url = [NSURL URLWithString:@"http://eng-media-02.cdngc.net/cdnlab/cs1/mega/sample_studio.MP4"];
-        NSStoryboard *storyboard = [NSStoryboard storyboardWithName:@"Main" bundle:nil];
-        _videoPlayerViewController = [storyboard instantiateControllerWithIdentifier:@"playerViewController"];
-        [_videoPlayerViewController setDelegate:(id)self];
-        [self presentViewControllerAsModalWindow:_videoPlayerViewController];
-        
-        
-        [_videoPlayerViewController loadMediaFile:url];
     }
     [self.view.window setTitle:_currentDirectoryURL];
 }

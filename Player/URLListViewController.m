@@ -15,6 +15,7 @@
 @interface URLListViewController ()
 
 @property (nonatomic) IBOutlet NSTableView *tableView;
+
 @property (nonatomic) VideoPlayerViewController *videoPlayerViewController;
 
 @end
@@ -61,12 +62,9 @@ static void *URLListContext = &URLListContext;
         return [NSString stringWithFormat:@"%ld", row + 1];
     } else {
         NSNumber *fileSizeNumber;
-        [[_urlList getURL:row] getResourceValue:&fileSizeNumber
-                                                      forKey:NSURLFileSizeKey
-                                                       error:nil];
+        [[_urlList getURL:row] getResourceValue:&fileSizeNumber forKey:NSURLFileSizeKey error:nil];
         long long fileSize = [fileSizeNumber longLongValue];
-        NSString *displayFileSize = [NSByteCountFormatter stringFromByteCount:fileSize
-                                                                   countStyle:NSByteCountFormatterCountStyleFile];
+        NSString *displayFileSize = [NSByteCountFormatter stringFromByteCount:fileSize countStyle:NSByteCountFormatterCountStyleFile];
         return [NSString stringWithFormat:@"%@", displayFileSize];
     }
 }
@@ -79,6 +77,21 @@ static void *URLListContext = &URLListContext;
 
 #pragma mark URLList Controller
 
+- (void)loadMediaFile:(NSURL*)url {
+    
+    NSStoryboard *videoPlayerViewControllerStoryboard = [NSStoryboard storyboardWithName:@"Main" bundle:nil];
+    _videoPlayerViewController = [videoPlayerViewControllerStoryboard instantiateControllerWithIdentifier:@"videoPlayerViewController"];
+    [_videoPlayerViewController setDelegate:(id)self];
+    [self presentViewControllerAsModalWindow:_videoPlayerViewController];
+    
+    [_videoPlayerViewController loadMediaFile:url];
+}
+
+- (void)removePlayerViewController {
+    
+    _videoPlayerViewController = nil;
+}
+
 
 #pragma mark Mouse event
 
@@ -86,9 +99,7 @@ static void *URLListContext = &URLListContext;
     if([_tableView selectedRow] != -1) {
         [_urlList setCurrentCursor:[_tableView selectedRow]];
         
-        [_videoPlayerViewController.view setHidden:NO];
-        
-        [_videoPlayerViewController loadMediaFile:[_urlList getURLFromCurrentCursor]];
+        [self loadMediaFile:[_urlList getURLFromCurrentCursor]];
     }
 }
 

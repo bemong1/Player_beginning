@@ -26,7 +26,7 @@
 - (void)playerDidReadyToPlay {
     [super playerDidReadyToPlay];
     
-    [self setRate:1.0f];
+    
 }
 
 - (void)dealloc {
@@ -56,27 +56,31 @@
 - (void)playOrPause {
     if(self.playbackState == PlaybackStatePlaying) {
         [self pause];
-    } else {
+    } else if(self.playbackState == PlaybackStatePaused) {
         [self play];
     }
 }
 
 - (void)increasePlaybackRate {
-    [self setRate:self.rate + 0.1f];
-    if(self.rate > (_maxRate - 0.05f)) {
+    if(self.rate >= _maxRate) {
         self.rate = _maxRate;
+        return;
     }
+    [self setRate:self.rate + 0.1f];
 }
 
 - (void)restorePlaybackRate {
+//    if(self.rate == 1.0f)
+//        return;
     [self setRate:1.0f];
 }
 
 - (void)decreasePlaybackRate {
-    [self setRate:self.rate - 0.1f];
-    if(self.rate < (_minRate + 0.05f)) {
+    if(self.rate <= _minRate) {
         self.rate = _minRate;
+        return;
     }
+    [self setRate:self.rate - 0.1f];
 }
 
 - (void)changeVideoGravity {

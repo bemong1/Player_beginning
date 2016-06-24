@@ -12,15 +12,15 @@
 #import "MediaFileExplorer.h"
 #import "VideoPlayerController.h"
 
-@protocol MediaFileExplorerDelegate <NSObject>
+@protocol URLListViewControllerDelegate <NSObject>
 
 - (void)removePlayerViewController;
 
 @end
 
-@interface VideoPlayerViewController : NSViewController <MediaFileExplorerDelegate>
+@interface VideoPlayerViewController : NSViewController <URLListViewControllerDelegate>
 
-@property (nonatomic, weak) id <MediaFileExplorerDelegate> delegate;
+@property (nonatomic, weak) id <URLListViewControllerDelegate> delegate;
 
 - (void)loadMediaFile:(NSURL*)url;
 

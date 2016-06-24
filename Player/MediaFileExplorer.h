@@ -9,9 +9,8 @@
 #import <Cocoa/Cocoa.h>
 
 
-@interface MediaFileExplorer : NSViewController 
+@interface MediaFileExplorer : NSViewController
 
-- (void)removePlayerViewController;
 
 @end
 

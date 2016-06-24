@@ -20,11 +20,14 @@
 @end
 
 
-@implementation PlayerController
+@implementation PlayerController {
+    float tempRate;
+}
 
 static void *PlaybackStatusContext = &PlaybackStatusContext;
 static void *ItemStatusContext = &ItemStatusContext;
 static void *RateStatusContext = &RateStatusContext;
+
 static void *PlaybackLikelyToKeepUp = &PlaybackLikelyToKeepUp;
 static void *PlaybackBufferEmpty = &PlaybackBufferEmpty;
 static void *PlaybackBufferFull = &PlaybackBufferFull;
@@ -47,6 +50,9 @@ NSString *const PlayerControllerRateDidChangeNotification = @"PlayerControllerRa
                 
         [self setVideoGravity:VideoGravityResizeAspect];
         [self open:fileURL];
+        
+        _rate = 1.0f;
+        
     }
     return self;    
 }
@@ -64,46 +70,54 @@ NSString *const PlayerControllerRateDidChangeNotification = @"PlayerControllerRa
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context {
+    
     if(context == ItemStatusContext) {
         if(_player.currentItem.status == AVPlayerStatusReadyToPlay) {
             dispatch_async(dispatch_get_main_queue(), ^{
+                NSLog(@"onPrepared");
                 [self playerDidReadyToPlay];
             });
         }
         return;
     }
     
-    if (context == PlaybackLikelyToKeepUp) {
-        if (_player.currentItem.playbackLikelyToKeepUp) {
-            PlaybackState tempState = _playbackState;
-            
-            [self setPlaybackState:PlaybackStatePlayable];
-            NSLog(@"Playable");
-            
-            if(tempState == PlaybackStatePlaying || tempState == PlaybackStateBuffering) {
-                [self play];
-            } else if(tempState == PlaybackStatePaused) {
-                [self pause];
-            }            
+    if(context == RateStatusContext) {
+        NSLog(@"_player.rate : %f _rate : %f", _player.rate, _rate);
+        if(_player.rate == 0.0f) {
+            if(_playbackState != PlaybackStatePaused) {
+                NSLog(@"onPause");
+                [self setPlaybackState:PlaybackStatePaused];
+            } else {
+                if([change[NSKeyValueChangeNewKey] floatValue] != [change[NSKeyValueChangeOldKey] floatValue])
+                    NSLog(@"onRateChanged");
+            }
+        } else {
+            if(_playbackState != PlaybackStatePlaying) {
+                NSLog(@"onPlay");
+                [self setPlaybackState:PlaybackStatePlaying];
+            } else {
+                if([change[NSKeyValueChangeNewKey] floatValue] != [change[NSKeyValueChangeOldKey] floatValue])
+                    NSLog(@"onRateChanged");
+            }
         }
-    }
-    if (context == PlaybackBufferEmpty) {
-        if (_player.currentItem.playbackBufferEmpty) {
-            NSLog(@"bufferEmpty");
-            [self setPlaybackState:PlaybackStateBuffering];
-        }
+        return;
     }
     
-    if(context == RateStatusContext) {
-        if(_player.rate == 0.0f) {
-            [self setPlaybackState:PlaybackStatePaused];
-            NSLog(@"Pause");
-        } else {
-            [self setPlaybackState:PlaybackStatePlaying];
-            NSLog(@"Play");
+    if (context == PlaybackLikelyToKeepUp) {
+        if (_player.currentItem.playbackLikelyToKeepUp) {
+            NSLog(@"onPlayable");
+            if(_playbackState == PlaybackStateBuffering) {
+                [self play];
+            }
         }
-        if(change[NSKeyValueChangeNewKey] != change[NSKeyValueChangeOldKey]) {
-            [[NSNotificationCenter defaultCenter] postNotificationName:PlayerControllerRateDidChangeNotification object:self];            
+        return;
+    }
+    
+    if (context == PlaybackBufferEmpty) {
+        if (_player.currentItem.playbackBufferEmpty) {
+            NSLog(@"onbufferEmpty");
+
+            [self setPlaybackState:PlaybackStateBuffering];
         }
         return;
     }
@@ -112,7 +126,7 @@ NSString *const PlayerControllerRateDidChangeNotification = @"PlayerControllerRa
         NSArray *timeRanges = (NSArray *)[change objectForKey:NSKeyValueChangeNewKey];
         if (timeRanges && [timeRanges count]) {
 //            CMTimeRange timeRange = [[timeRanges objectAtIndex:0] CMTimeRangeValue];
-//            NSLog(@" . . . %.5f -> %.5f", CMTimeGetSeconds(timeRange.start), CMTimeGetSeconds(CMTimeAdd(timeRange.start, timeRange.duration)));
+//            NSLog(@"Loaded Range : %.5f to %.5f", CMTimeGetSeconds(timeRange.start), CMTimeGetSeconds(CMTimeAdd(timeRange.start, timeRange.duration)));
             if(!_player.currentItem.playbackLikelyToKeepUp) {
                 NSLog(@"Buffering");
                 [self setPlaybackState:PlaybackStateBuffering];
@@ -128,6 +142,7 @@ NSString *const PlayerControllerRateDidChangeNotification = @"PlayerControllerRa
 - (void)open:(NSURL*)fileURL {
     AVURLAsset *asset= [AVURLAsset URLAssetWithURL:fileURL options:nil];
     NSString *tracksKey = @"tracks";
+    NSLog(@"opening...");
     
     [asset loadValuesAsynchronouslyForKeys:@[tracksKey] completionHandler:^() {
         dispatch_async(dispatch_get_main_queue(), ^ {
@@ -135,6 +150,7 @@ NSString *const PlayerControllerRateDidChangeNotification = @"PlayerControllerRa
             AVKeyValueStatus status = [asset statusOfValueForKey:@"tracks" error:&error];
             
             if(status == AVKeyValueStatusLoaded) {
+                NSLog(@"opened");
                 [self setLoadState:LoadStateLoading];
                 
                 AVPlayerItem* playerItem = [AVPlayerItem playerItemWithAsset:asset];
@@ -150,10 +166,9 @@ NSString *const PlayerControllerRateDidChangeNotification = @"PlayerControllerRa
                  _originalSize = [[asset tracksWithMediaType:AVMediaTypeVideo][0] naturalSize];
                 
                 [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemDidReachEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:_player.currentItem];
-                [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPlaybackStalledNotification:) name:AVPlayerItemPlaybackStalledNotification object:playerItem ];
                 
-                [_player addObserver:self forKeyPath:@"rate" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:RateStatusContext];
                 [_player.currentItem addObserver:self forKeyPath:@"status" options:0 context:ItemStatusContext];
+                [_player addObserver:self forKeyPath:@"rate" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:RateStatusContext];
                 
                 [_player.currentItem addObserver:self forKeyPath:@"playbackBufferEmpty" options:0 context:PlaybackBufferEmpty];
                 [_player.currentItem addObserver:self forKeyPath:@"playbackLikelyToKeepUp" options:0 context:PlaybackLikelyToKeepUp];
@@ -171,20 +186,19 @@ NSString *const PlayerControllerRateDidChangeNotification = @"PlayerControllerRa
     [[NSNotificationCenter defaultCenter] postNotificationName:PlayerControllerPlaybackDidPlayToEndTimeNotification object:self];
 }
 
-- (void)onPlaybackStalledNotification:(NSNotification*)notification {
-    
-}
-
 
 #pragma mark Playback Controller
 
 - (void)play {
+    NSLog(@"call play : %f", _rate);
     if (_player.currentItem.playbackLikelyToKeepUp) {
+        [self setRate:_rate];
         _player.rate = _rate;
     }
 }
 
 - (void)pause {
+    NSLog(@"call pause");
     _player.rate = 0.0f;
 }
 
@@ -219,10 +233,15 @@ NSString *const PlayerControllerRateDidChangeNotification = @"PlayerControllerRa
 }
 
 - (void)setRate:(float)rate {
-    if(_playbackState == PlaybackStatePlaying) {
-        _player.rate = _rate = rate;
+    if(rate != 0.0f) {
+        if(_player.rate == 0.0f) {
+            _rate = rate;
+            NSLog(@"onRateChanged");
+        } else {
+            _player.rate = _rate = rate;
+        }
     } else {
-        _rate = rate;        
+        _player.rate = rate;
     }
 }
 

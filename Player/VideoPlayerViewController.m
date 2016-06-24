@@ -28,7 +28,6 @@
 #pragma mark Playback Controller Button
 
 @property (strong) IBOutlet NSButton *playOrPauseButton;
-@property (strong) IBOutlet NSButton *stopButton;
 
 @property (strong) IBOutlet NSButton *increasePlaybackRateButton;
 @property (strong) IBOutlet NSButton *restorePlaybackRateButton;
@@ -116,13 +115,7 @@ void *StateRateContext = &StateRateContext;
     _volumeBarSlider.floatValue = 1.0f;
 }
 
-- (void)dealloc {
-    NSLog(@"VideoPlayerViewController destroy!!");
-}
-
-- (void)dismissController:(id)sender {
-    [super dismissController:sender];
-    
+- (BOOL)windowShouldClose:(id)sender {
     [_videoPlayerController pause];
     [self removeNotifications:_videoPlayerController];
     
@@ -130,6 +123,11 @@ void *StateRateContext = &StateRateContext;
     _videoPlayerController = nil;
     
     [self removePlayerViewController];
+    return YES;
+}
+
+- (void)dealloc {
+    NSLog(@"VideoPlayerViewController destroy!!");
 }
 
 - (void)removePlayerViewController {
@@ -171,7 +169,7 @@ void *StateRateContext = &StateRateContext;
     } else if(_videoPlayerController.playbackState == PlaybackStateBuffering) {
         _loadStateProgressIndicator.hidden = NO;
         [_loadStateProgressIndicator startAnimation:nil];
-    } else if(_videoPlayerController.playbackState == PlaybackStatePlayable) {
+    } else if(_videoPlayerController.playbackState != PlaybackStateBuffering) {
         [_loadStateProgressIndicator startAnimation:nil];
         _loadStateProgressIndicator.hidden = YES;
     }
@@ -204,9 +202,8 @@ void *StateRateContext = &StateRateContext;
         _volumeBarSlider.maxValue = 1.0f;
         
         _currentTimeViewButton.title = [NSString changeTimeFloatToNSString:_videoPlayerController.currentTime];
-        _durationTimeViewButton.title = [NSString changeTimeFloatToNSString:_videoPlayerController.durationTime];
+        _durationTimeViewButton.title = [NSString changeTimeFloatToNSString:_videoPlayerController.durationTime];        
         
-
     } else if(_videoPlayerController.loadState == LoadStateFailed) {
         [self setEnabledSubControllers:NO];
         
@@ -229,7 +226,7 @@ void *StateRateContext = &StateRateContext;
 }
 
 - (void)onPlayerControllerRateDidPlayToEndTimeNotification {
-    NSLog(@"Rate!");
+    
 }
 
 - (void)onShowPlaybackTime:(NSTimer*)timer {
@@ -282,8 +279,21 @@ void *StateRateContext = &StateRateContext;
 }
 
 - (IBAction)seekBarAction:(id)sender {
+    NSEvent* event = [[NSApplication sharedApplication] currentEvent];
+    
+    static PlaybackState tempState;
+    if(event.type == NSLeftMouseDown) {
+        tempState = _videoPlayerController.playbackState;
+        [_videoPlayerController pause];
+    }
     _videoPlayerController.currentTime = _seekBarSlider.floatValue;
     _currentTimeViewButton.title = [NSString changeTimeFloatToNSString:_videoPlayerController.currentTime];
+    
+    if(event.type == NSLeftMouseUp) {
+        if(tempState == PlaybackStatePlaying) {[_videoPlayerController play];}
+        if(tempState == PlaybackStatePaused) {[_videoPlayerController pause];}
+        if(tempState == PlaybackStateBuffering) {[_videoPlayerController play];}
+    }
 }
 
 - (IBAction)volumeBarAction:(id)sender {
@@ -404,7 +414,6 @@ void *StateRateContext = &StateRateContext;
     NSFont* font = [NSFont fontWithName:@"Feather" size:25];
     
     [self setAttributeButton:_playOrPauseButton title:@"" color:[NSColor blueColor] font:font];
-    [self setAttributeButton:_stopButton title:@"" color:[NSColor blueColor] font:font];
     [self setAttributeButton:_stepForwardButton title:@"" color:[NSColor blueColor] font:font];
     [self setAttributeButton:_stepBackwardButton title:@"" color:[NSColor blueColor] font:font];
     [self setAttributeButton:_previousButton title:@"" color:[NSColor blueColor] font:font];
@@ -452,6 +461,5 @@ void *StateRateContext = &StateRateContext;
                         range:range];
     [button setAttributedTitle:buttonTitle];
 }
-
 
 @end

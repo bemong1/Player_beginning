@@ -10,10 +10,6 @@
 
 @interface URLList : NSObject
 
-#pragma mark Singleton instance
-
-+ (URLList*)sharedURLList;
-
 #pragma mark List Controller
 
 - (void)addURL:(NSURL*)URL;
