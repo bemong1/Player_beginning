@@ -202,7 +202,9 @@ void *StateRateContext = &StateRateContext;
         _volumeBarSlider.maxValue = 1.0f;
         
         _currentTimeViewButton.title = [NSString changeTimeFloatToNSString:_videoPlayerController.currentTime];
-        _durationTimeViewButton.title = [NSString changeTimeFloatToNSString:_videoPlayerController.durationTime];        
+        _durationTimeViewButton.title = [NSString changeTimeFloatToNSString:_videoPlayerController.durationTime];
+        
+        [_videoPlayerController play];
         
     } else if(_videoPlayerController.loadState == LoadStateFailed) {
         [self setEnabledSubControllers:NO];
@@ -279,21 +281,27 @@ void *StateRateContext = &StateRateContext;
 }
 
 - (IBAction)seekBarAction:(id)sender {
-    NSEvent* event = [[NSApplication sharedApplication] currentEvent];
-    
-    static PlaybackState tempState;
-    if(event.type == NSLeftMouseDown) {
-        tempState = _videoPlayerController.playbackState;
-        [_videoPlayerController pause];
-    }
+//    NSEvent* event = [[NSApplication sharedApplication] currentEvent];
+//    
+//    static PlaybackState tempState;
+//    if(event.type == NSLeftMouseDown) {
+//        tempState = _videoPlayerController.playbackState;
+//        [_videoPlayerController pause];
+//    }
     _videoPlayerController.currentTime = _seekBarSlider.floatValue;
     _currentTimeViewButton.title = [NSString changeTimeFloatToNSString:_videoPlayerController.currentTime];
     
-    if(event.type == NSLeftMouseUp) {
-        if(tempState == PlaybackStatePlaying) {[_videoPlayerController play];}
-        if(tempState == PlaybackStatePaused) {[_videoPlayerController pause];}
-        if(tempState == PlaybackStateBuffering) {[_videoPlayerController play];}
-    }
+//    if(event.type == NSLeftMouseUp) {
+//        if(tempState == PlaybackStatePlaying) {[_videoPlayerController play];}
+//        else if(tempState == PlaybackStatePaused) {[_videoPlayerController pause];}
+//        else if(tempState == PlaybackStateBuffering) {
+//            if(_videoPlayerController.latelyStateOnBuffer == PlaybackStatePlaying) {
+//                [_videoPlayerController play];
+//            } else if (_videoPlayerController.latelyStateOnBuffer == PlaybackStatePaused) {
+//                [_videoPlayerController pause];
+//            }
+//        }
+//    }
 }
 
 - (IBAction)volumeBarAction:(id)sender {

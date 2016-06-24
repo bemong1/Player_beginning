@@ -54,11 +54,19 @@
 #pragma mark API
 
 - (void)playOrPause {
+    
     if(self.playbackState == PlaybackStatePlaying) {
         [self pause];
     } else if(self.playbackState == PlaybackStatePaused) {
         [self play];
+    } else if(self.playbackState == PlaybackStateBuffering) {
+        if(self.latelyStateOnBuffer == PlaybackStatePlaying) {
+            [self play];
+        } else if (self.latelyStateOnBuffer == PlaybackStatePaused) {
+            [self pause];
+        }
     }
+    
 }
 
 - (void)increasePlaybackRate {

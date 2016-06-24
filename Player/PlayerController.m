@@ -20,9 +20,7 @@
 @end
 
 
-@implementation PlayerController {
-    float tempRate;
-}
+@implementation PlayerController
 
 static void *PlaybackStatusContext = &PlaybackStatusContext;
 static void *ItemStatusContext = &ItemStatusContext;
@@ -47,17 +45,17 @@ NSString *const PlayerControllerRateDidChangeNotification = @"PlayerControllerRa
     if (self != nil) {
         [self.layer backgroundColorRed:0.f green:0.f blue:0.f alpha:0.8f];
         [self setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
-                
+        
         [self setVideoGravity:VideoGravityResizeAspect];
         [self open:fileURL];
         
         _rate = 1.0f;
         
     }
-    return self;    
+    return self;
 }
 
-- (void)dealloc {    
+- (void)dealloc {
     [_player.currentItem removeObserver:self forKeyPath:@"status"];
     [_player removeObserver:self forKeyPath:@"rate"];
     
@@ -74,7 +72,7 @@ NSString *const PlayerControllerRateDidChangeNotification = @"PlayerControllerRa
     if(context == ItemStatusContext) {
         if(_player.currentItem.status == AVPlayerStatusReadyToPlay) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                NSLog(@"onPrepared");
+                NSLog(@"onPrepared : %ld", _playbackState);
                 [self playerDidReadyToPlay];
             });
         }
@@ -82,7 +80,6 @@ NSString *const PlayerControllerRateDidChangeNotification = @"PlayerControllerRa
     }
     
     if(context == RateStatusContext) {
-        NSLog(@"_player.rate : %f _rate : %f", _player.rate, _rate);
         if(_player.rate == 0.0f) {
             if(_playbackState != PlaybackStatePaused) {
                 NSLog(@"onPause");
@@ -105,17 +102,25 @@ NSString *const PlayerControllerRateDidChangeNotification = @"PlayerControllerRa
     
     if (context == PlaybackLikelyToKeepUp) {
         if (_player.currentItem.playbackLikelyToKeepUp) {
-            NSLog(@"onPlayable");
-            if(_playbackState == PlaybackStateBuffering) {
-                [self play];
+            NSLog(@"Playable");
+            if (_playbackState == PlaybackStateBuffering) {
+                if(_latelyStateOnBuffer == PlaybackStatePaused) {
+                    [self pause];
+                } else if(_latelyStateOnBuffer == PlaybackStatePlaying) {
+                    [self play];
+                }
             }
+        } else {
+            NSLog(@"Impossible");
+            _latelyStateOnBuffer = _playbackState;
+            [self pause];
         }
         return;
     }
     
     if (context == PlaybackBufferEmpty) {
-        if (_player.currentItem.playbackBufferEmpty) {
-            NSLog(@"onbufferEmpty");
+        if(_player.currentItem.playbackBufferEmpty) {
+            NSLog(@"Buffering / lately state : %ld", (long)_playbackState);         
 
             [self setPlaybackState:PlaybackStateBuffering];
         }
@@ -125,12 +130,9 @@ NSString *const PlayerControllerRateDidChangeNotification = @"PlayerControllerRa
     if(context == PlaybackLoadedTimeRanges) {
         NSArray *timeRanges = (NSArray *)[change objectForKey:NSKeyValueChangeNewKey];
         if (timeRanges && [timeRanges count]) {
-//            CMTimeRange timeRange = [[timeRanges objectAtIndex:0] CMTimeRangeValue];
-//            NSLog(@"Loaded Range : %.5f to %.5f", CMTimeGetSeconds(timeRange.start), CMTimeGetSeconds(CMTimeAdd(timeRange.start, timeRange.duration)));
-            if(!_player.currentItem.playbackLikelyToKeepUp) {
-                NSLog(@"Buffering");
-                [self setPlaybackState:PlaybackStateBuffering];
-            }
+            CMTimeRange timeRange = [[timeRanges objectAtIndex:0] CMTimeRangeValue];
+            NSLog(@"Loaded Range : %.5f to %.5f", CMTimeGetSeconds(timeRange.start), CMTimeGetSeconds(CMTimeAdd(timeRange.start, timeRange.duration)));
+
         }
     }
 }
@@ -163,7 +165,7 @@ NSString *const PlayerControllerRateDidChangeNotification = @"PlayerControllerRa
                 [self.layer addSublayer:_playerLayer];
                 self.layer.zPosition = -1;
                 
-                 _originalSize = [[asset tracksWithMediaType:AVMediaTypeVideo][0] naturalSize];
+                _originalSize = [[asset tracksWithMediaType:AVMediaTypeVideo][0] naturalSize];
                 
                 [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemDidReachEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:_player.currentItem];
                 
@@ -190,7 +192,7 @@ NSString *const PlayerControllerRateDidChangeNotification = @"PlayerControllerRa
 #pragma mark Playback Controller
 
 - (void)play {
-    NSLog(@"call play : %f", _rate);
+    NSLog(@"call play");
     if (_player.currentItem.playbackLikelyToKeepUp) {
         [self setRate:_rate];
         _player.rate = _rate;
@@ -215,7 +217,7 @@ NSString *const PlayerControllerRateDidChangeNotification = @"PlayerControllerRa
     [[NSNotificationCenter defaultCenter] postNotificationName:PlayerControllerLoadStateDidChangeNotification object:self];
 }
 
-- (void)setVideoGravity:(VideoGravity)videoGravity { 
+- (void)setVideoGravity:(VideoGravity)videoGravity {
     switch(videoGravity) {
         case VideoGravityResize:
             _playerLayer.videoGravity = AVLayerVideoGravityResize;

@@ -47,6 +47,7 @@ typedef NS_ENUM(NSInteger, VideoGravity) {
 
 @property (nonatomic, readonly) CGSize originalSize;
 
+@property (nonatomic) PlaybackState latelyStateOnBuffer;
 @property (nonatomic, readonly) PlaybackState playbackState;
 @property (nonatomic, readonly) LoadState loadState;
 @property (nonatomic) VideoGravity videoGravity;
